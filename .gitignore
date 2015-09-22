@@ -1,0 +1,9 @@
+\#*\#
+.\#.*
+.\#*
+*~
+*.elc
+/server/
+projectile-bookmarks.eld
+.savehist
+projects.el
