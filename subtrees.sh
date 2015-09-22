@@ -103,3 +103,4 @@ ${cmd} modes/projectile https://github.com/bbatsov/projectile.git v0.12.0
 ${cmd} modes/rust https://github.com/rust-lang/rust-mode master
 ${cmd} modes/smartparens https://github.com/Fuco1/smartparens.git master
 ${cmd} modes/smooth-scrolling https://github.com/aspiers/smooth-scrolling.git master
+${cmd} modes/wrap-region https://github.com/rejeep/wrap-region.el.git master
