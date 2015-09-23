@@ -518,6 +518,17 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (require 'echo-keys)
 (require 'goto-last-change)
 (require 'track-mode)
+(require 'wrap-region)
+
+;;
+
+(wrap-region-add-wrappers
+ '(("{-# " " #-}" "#" (haskell-mode))
+   ("/* " " */" "/" (java-mode javascript-mode css-mode c-mode c++-mode))
+   ("{- " " -}" "/" (haskell-mode))
+   ("`" "`" nil (markdown-mode))))
+
+(add-to-list 'wrap-region-except-modes 'magit-mode)
 
 ;;
 ;; (read in Winston Churchill's voice):
