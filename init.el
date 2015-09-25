@@ -576,6 +576,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key (kbd "M-^")			'highlight-symbol-query-replace)
 
 (global-set-key [(control b)]			'helm-buffers-list)
+;; Instead of sp-up-sexp
+(global-set-key [(control meta b)]		'helm-projectile-switch-to-buffer)
 (global-set-key [(control x) (control f)]	'helm-find-files)
 
 (global-set-key (kbd "C-x <left>")		'diff-hl-previous-hunk)
