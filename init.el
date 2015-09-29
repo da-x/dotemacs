@@ -529,6 +529,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
    ("`" "`" nil (markdown-mode))))
 
 (add-to-list 'wrap-region-except-modes 'magit-mode)
+(wrap-region-global-mode)
 
 ;;
 ;; (read in Winston Churchill's voice):
