@@ -791,7 +791,7 @@ grep search results buffers."
 (defun my/interactive-haskell-mode-keys ()
   (interactive)
 
-  (define-key interactive-haskell-mode-map [f7]			'haskell-process-load-or-reload)
+  (define-key interactive-haskell-mode-map [f7]			'my/haskell-process-load-or-reload)
   (define-key interactive-haskell-mode-map [f12]		'haskell-process-reload-devel-main)
   (define-key interactive-haskell-mode-map (kbd "M-,")		'my/haskell-who-calls)
   (define-key interactive-haskell-mode-map (kbd "C-`")		'haskell-interactive-bring)

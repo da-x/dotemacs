@@ -49,6 +49,11 @@
         (setq compilation-error-regexp-alist
               haskell-compilation-error-regexp-alist)))))
 
+(defun my/haskell-process-load-or-reload ()
+  (interactive)
+  (haskell-process-load-or-reload)
+  )
+
 (defun my/haskell-interactive-toggle-print-mode ()
   (interactive)
   (setq haskell-interactive-mode-eval-mode
