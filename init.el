@@ -130,7 +130,7 @@
 	  ": " (or "fatal error" "error") ": " (message) line-end))
    :error-filter
    (lambda (errors)
-     (flycheck-fold-include-errors
+     (flycheck-fold-include-levels
       (flycheck-sanitize-errors errors) "In file included from"))
    :modes (c-mode c++-mode))
 
