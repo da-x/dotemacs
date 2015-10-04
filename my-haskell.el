@@ -189,7 +189,7 @@
 ;; (add-hook 'haskell-mode-hook 'my/enable-stack-mode)
 
 
-; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
 (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
