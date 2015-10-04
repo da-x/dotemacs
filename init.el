@@ -283,6 +283,12 @@
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 
+(defun my/markdown-mode-hook ()
+  (interactive)
+  (electric-indent-local-mode -1)
+)
+(add-hook 'markdown-mode-hook 'my/markdown-mode-hook)
+
 ;; Repository root
 (require 'repository-root)
 (add-to-list 'repository-root-matchers repository-root-matcher/git)
