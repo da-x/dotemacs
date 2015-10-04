@@ -170,7 +170,26 @@
 )
 (add-hook 'haskell-cabal-mode-hook 'my/haskell-cabal-mode-hook)
 
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+;;
+;; This will enable stack-ide in the future. Currently it's broken for me -
+;; project-local imports fail in flycheck.
+;;
+;; (require 'flycheck)
+;; (add-to-list 'load-path "/home/dan/dev/gh/commercialhaskell/stack-ide/stack-mode/")
+
+(defun my/enable-stack-mode ()
+  (interactive)
+  (flycheck-mode t)
+  (flycheck-disable-checker 'haskell-ghc)
+  (flycheck-disable-checker 'haskell-stack-ghc)
+  (flycheck-clear t)
+  (stack-mode t))
+
+;; (require 'stack-mode)
+;; (add-hook 'haskell-mode-hook 'my/enable-stack-mode)
+
+
+; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
 (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
