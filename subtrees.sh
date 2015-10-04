@@ -86,7 +86,7 @@ ${cmd} modes/company-mode https://github.com/company-mode/company-mode 0.8.11
 ${cmd} modes/dash https://github.com/magnars/dash.el.git master
 ${cmd} modes/diff-hl https://github.com/dgutov/diff-hl.git master
 ${cmd} modes/dmode https://github.com/Emacs-D-Mode-Maintainers/Emacs-D-Mode.git master
-${cmd} modes/flycheck https://github.com/flycheck/flycheck.git 0.21
+${cmd} modes/flycheck https://github.com/flycheck/flycheck.git 0.24
 ${cmd} modes/flycheck-rust https://github.com/flycheck/flycheck-rust master
 ${cmd} modes/ghci-ng https://github.com/chrisdone/ghci-ng.git master
 ${cmd} modes/gitmodes https://github.com/magit/git-modes.git master
