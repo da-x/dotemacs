@@ -286,6 +286,7 @@
 (defun my/markdown-mode-hook ()
   (interactive)
   (electric-indent-local-mode -1)
+  (my/markdown-mode-set-keys)
 )
 (add-hook 'markdown-mode-hook 'my/markdown-mode-hook)
 
@@ -842,6 +843,19 @@ grep search results buffers."
   (define-key haskell-cabal-mode-map (kbd "C-c c")	'haskell-process-cabal)
   (define-key haskell-cabal-mode-map (kbd "C-c C-k")	'haskell-interactive-mode-clear)
 )
+
+(defun my/markdown-mode-set-keys ()
+  (inteactive)
+
+  (local-set-key (kbd "M-<up>")	        'windmove-up)
+  (local-set-key (kbd "M-<down>")	'windmove-down)
+  (local-set-key (kbd "M-<right>")	'windmove-right)
+  (local-set-key (kbd "M-<left>")	'windmove-left)
+  (local-set-key (kbd "C-M-<up>")       'markdown-move-up)
+  (local-set-key (kbd "C-M-<down>")	'markdown-move-down)
+  (local-set-key (kbd "C-M-<right>")	'markdown-demote)
+  (local-set-key (kbd "C-M-<left>")	'markdown-promote)
+  )
 
 ;; Instead of sp-up-sexp
 (global-set-key [(control meta b)]		'helm-buffers-list)
