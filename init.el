@@ -238,6 +238,14 @@
   (magit-diff-working-tree "HEAD")
 )
 
+(defun my/magit-log-test ()
+  (interactive)
+  ;; Attempting to have magit-log's configuration to be stateless.
+  ;;
+  ;; (setq magit-log-arugments (quote ("--graph" "--decorate")))
+  (magit-log-head)
+)
+
 (add-hook 'git-commit-mode-hook 'my/git-commit-mode-hook)
 (require 'magit)
 
@@ -670,23 +678,44 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 
 (global-set-key (kbd "C-!")                     'delete-other-windows)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Magit shortcuts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; To quickly get into git context from editing context, this unbinds some
+;; unused Emacs stuff, rebinds to Magit, and and reminds me to which git
+;; shell commands it is equivalent.
+;;
+;; 'git status'
 (global-unset-key	[(control n)]) ;; next-line
 (global-set-key		[(control n)]  'magit-status)
+
+;; 'git log HEAD --branches'
 (global-unset-key	[(control q)]) ;; quoted-insert
-(global-set-key		[(control q)]  'magit-log-current)
+(global-set-key		[(control q)]  'magit-log-branches)
+;; [return]: To look at commits
+;; P Q: To push
+
+;; 'git log' on the current file
+(global-unset-key	(kbd "M-e"))   ;; forward-sentence
+(global-set-key		(kbd "M-e")    'magit-log-buffer-file)
+
+;; 'git branch'
 (global-unset-key	(kbd "M-="))   ;; count-words-region
 (global-set-key		(kbd "M-=")    'magit-branch-manager)
+
+;; 'git diff' on uncommited changes
 (global-unset-key	(kbd "M-a"))   ;; backward-sentence
 (global-set-key		(kbd "M-a")    'my/magit-show-diff-current-head-working-tree)
-(global-unset-key	(kbd "M-'"))   ;; count-words-region
-(global-set-key		(kbd "M-'")    'magit-commit-amend)
-(global-set-key         (kbd "M-C-'")  'my/git-comment-amend-no-questions)
-(global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
-(global-set-key		(kbd "M-i")    'magit-commit)
-;; Undefine some stuff that collides
-(define-key             magit-mode-map       [C-tab] nil)
 
+;; quick amend
+(global-set-key         (kbd "M-C-'")  'my/git-comment-amend-no-questions)
+
+;; undefine some stuff from Magit that collides with regular emacs use
+(define-key             magit-mode-map       [C-tab] nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-unset-key	(kbd "M-'"))   ;; count-words-region
 (global-unset-key	(kbd "M-c"))   ;; capitalize-word
 (global-set-key         (kbd "M-c")    'helm-projectile-find-file-dwim)
 (global-unset-key	(kbd "M-f"))   ;; forward-word
@@ -698,7 +727,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key		(kbd "C-\\")   'my/append-to-kill-ring)
 (global-unset-key	(kbd "C-@"))   ;; set-mark-command
 (global-unset-key	(kbd "C-_"))   ;; undo
-(global-unset-key	(kbd "M-e"))   ;; forward-sentence
+(global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
 (global-unset-key	(kbd "M-k"))   ;; kill-sentence
 (global-set-key		(kbd "M-k")    'highlight-symbol-query-replace)
 (global-unset-key	(kbd "M-t"))   ;; transport-words
