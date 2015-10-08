@@ -97,7 +97,7 @@ ${cmd} modes/helm-git-grep https://github.com/Peaker/helm-git-grep.git master
 ${cmd} modes/helm-ls-git https://github.com/Peaker/helm-ls-git.git master
 ${cmd} modes/helm-proc https://github.com/markus1189/helm-proc.git master
 ${cmd} modes/hindent https://github.com/chrisdone/hindent.git master
-${cmd} modes/magit https://github.com/magit/magit.git master
+${cmd} modes/magit https://github.com/magit/magit.git 2.2.2
 ${cmd} modes/perspective https://github.com/nex3/perspective-el.git 1.12
 ${cmd} modes/projectile https://github.com/bbatsov/projectile.git v0.12.0
 ${cmd} modes/rust https://github.com/rust-lang/rust-mode master
