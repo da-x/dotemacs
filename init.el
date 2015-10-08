@@ -453,11 +453,6 @@ buffer instead of replacing the text in region."
   (delete-other-windows)
   )
 
-(defun my/magit-file-log-y ()
-  (interactive)
-  (magit-file-log (buffer-file-name))
-  )
-
 (defun my/c-backslash-align ()
   (interactive)
   (let ((col (read-number "Column: ")))
@@ -664,50 +659,46 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key [(control next)]		'sp-end-of-sexp)
 
 (global-set-key [f3]				'my/spawn-terminal-in-current-project-root)
-(global-set-key [(control f3)]			'magit-log)
-(global-set-key [(control x) (control f3)]	'my/magit-log-new-frame)
-(global-set-key [(control x) (v) (e)]		'my/magit-show-diff-current-head-working-tree)
-(global-set-key [(control x) (v) (S)]		'magit-status)
-(global-set-key (kbd "C-x v <return>")		'my/git-comment-amend-no-questions)
 
 (global-set-key (kbd "C-x v <up>")		'buf-move-up)
 (global-set-key (kbd "C-x v <down>")		'buf-move-down)
 (global-set-key (kbd "C-x v <right>")		'buf-move-right)
 (global-set-key (kbd "C-x v <left>")		'buf-move-left)
-(global-set-key (kbd "C-x v <insert>")		'magit-commit)
-(global-set-key (kbd "C-x v l")			'magit-log)
 
 (global-unset-key [(control meta r)])            ;; isearch-backward-regexp
 (global-set-key   [(control meta r)]            'my/open-repository-root-dir)
 
 (global-set-key (kbd "C-!")                     'delete-other-windows)
 
+;; Magit shortcuts
 (global-unset-key	[(control n)]) ;; next-line
 (global-set-key		[(control n)]  'magit-status)
+(global-unset-key	[(control q)]) ;; quoted-insert
+(global-set-key		[(control q)]  'magit-log-current)
+(global-unset-key	(kbd "M-="))   ;; count-words-region
+(global-set-key		(kbd "M-=")    'magit-branch-manager)
+(global-unset-key	(kbd "M-a"))   ;; backward-sentence
+(global-set-key		(kbd "M-a")    'my/magit-show-diff-current-head-working-tree)
+(global-unset-key	(kbd "M-'"))   ;; count-words-region
+(global-set-key		(kbd "M-'")    'magit-commit-amend)
+(global-set-key         (kbd "M-C-'")  'my/git-comment-amend-no-questions)
+(global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
+(global-set-key		(kbd "M-i")    'magit-commit)
+;; Undefine some stuff that collides
+(define-key             magit-mode-map       [C-tab] nil)
+
+(global-unset-key	(kbd "M-c"))   ;; capitalize-word
+(global-set-key         (kbd "M-c")    'helm-projectile-find-file-dwim)
+(global-unset-key	(kbd "M-f"))   ;; forward-word
 (global-unset-key	[(control p)]) ;; previous-line
 (global-set-key		[(control p)]  'goto-last-change)
-(global-unset-key	[(control q)]) ;; quoted-insert
-(global-set-key		[(control q)]  'magit-file-log)
 (global-unset-key	(kbd "C--"))   ;; negative-arugment
 (global-unset-key	(kbd "C-/"))   ;; undo
 (global-unset-key	(kbd "C-\\"))  ;; toggle-input-mode
 (global-set-key		(kbd "C-\\")   'my/append-to-kill-ring)
 (global-unset-key	(kbd "C-@"))   ;; set-mark-command
 (global-unset-key	(kbd "C-_"))   ;; undo
-(global-unset-key	(kbd "M-="))   ;; count-words-region
-(global-set-key		(kbd "M-=")    'magit-branch-manager)
-(global-unset-key	(kbd "M-'"))   ;; count-words-region
-(global-set-key		(kbd "M-'")    'magit-commit-amend)
-(global-unset-key	(kbd "M-a"))   ;; backward-sentence
-(global-set-key		(kbd "M-a")    'my/magit-show-diff-current-head-working-tree)
-(global-unset-key	(kbd "M-c"))   ;; capitalize-word
-(global-set-key         (kbd "M-c")    'helm-projectile-find-file-dwim)
 (global-unset-key	(kbd "M-e"))   ;; forward-sentence
-(global-set-key		(kbd "M-e")    'magit-log)
-(global-unset-key	(kbd "M-f"))   ;; forward-word
-(global-set-key		(kbd "M-f")    'my/magit-file-log-y)
-(global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
-(global-set-key		(kbd "M-i")    'insert-register)
 (global-unset-key	(kbd "M-k"))   ;; kill-sentence
 (global-set-key		(kbd "M-k")    'highlight-symbol-query-replace)
 (global-unset-key	(kbd "M-t"))   ;; transport-words
