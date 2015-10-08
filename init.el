@@ -238,12 +238,9 @@
   (magit-diff-working-tree "HEAD")
 )
 
-(defun my/magit-log-test ()
+(defun my/magit-log-branches ()
   (interactive)
-  ;; Attempting to have magit-log's configuration to be stateless.
-  ;;
-  ;; (setq magit-log-arugments (quote ("--graph" "--decorate")))
-  (magit-log-head)
+  (magit-log-branches (quote ("--graph" "--decorate" "--color")))
 )
 
 (add-hook 'git-commit-mode-hook 'my/git-commit-mode-hook)
@@ -692,9 +689,10 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 
 ;; 'git log HEAD --branches'
 (global-unset-key	[(control q)]) ;; quoted-insert
-(global-set-key		[(control q)]  'magit-log-branches)
+(global-set-key		[(control q)]  'my/magit-log-branches)
 ;; [return]: To look at commits
-;; P Q: To push
+;; P Q: push
+;; r e: rebase interactive from here
 
 ;; 'git log' on the current file
 (global-unset-key	(kbd "M-e"))   ;; forward-sentence
@@ -703,6 +701,11 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 ;; 'git branch'
 (global-unset-key	(kbd "M-="))   ;; count-words-region
 (global-set-key		(kbd "M-=")    'magit-branch-manager)
+;; b c: create branch
+;; b u: set upstream
+;; k: delete branch
+;; R: rename branch
+;; r r: rebase
 
 ;; 'git diff' on uncommited changes
 (global-unset-key	(kbd "M-a"))   ;; backward-sentence
@@ -711,7 +714,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 ;; quick amend
 (global-set-key         (kbd "M-C-'")  'my/git-comment-amend-no-questions)
 
-;; undefine some stuff from Magit that collides with regular emacs use
+;; stuff that modify/fix the magit mode maps
+(define-key             magit-status-mode-map   (kbd "M-i")  'magit-commit-amend)
 (define-key             magit-mode-map       [C-tab] nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
