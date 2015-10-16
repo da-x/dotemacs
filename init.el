@@ -608,7 +608,6 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key (kbd "C-M-w")			'sp-copy-sexp)
 
 (global-set-key (kbd "M-<delete>")		'sp-splice-sexp)
-(global-set-key (kbd "C-]")			'sp-select-next-thing-exchange)
 
 (global-set-key (kbd "M-] ESC")			'projectile-project-buffers-other-buffer)
 (global-set-key (kbd "M-] !")			'projectile-run-shell-command-in-root)
@@ -664,6 +663,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key [(control next)]		'sp-end-of-sexp)
 
 (global-set-key [f3]				'my/spawn-terminal-in-current-project-root)
+
+(global-set-key (kbd "C-x x")		        'new-frame)
 
 (global-set-key (kbd "C-x v <up>")		'buf-move-up)
 (global-set-key (kbd "C-x v <down>")		'buf-move-down)
@@ -728,7 +729,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-unset-key	(kbd "C--"))   ;; negative-arugment
 (global-unset-key	(kbd "C-/"))   ;; undo
 (global-unset-key	(kbd "C-\\"))  ;; toggle-input-mode
-(global-set-key		(kbd "C-\\")   'my/append-to-kill-ring)
+(global-set-key		(kbd "C-\\")   'sp-select-next-thing-exchange)
+(global-set-key         (kbd "C-]")    'my/append-to-kill-ring)
 (global-unset-key	(kbd "C-@"))   ;; set-mark-command
 (global-unset-key	(kbd "C-_"))   ;; undo
 (global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
@@ -776,7 +778,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key [(control z)]		'undo)
 
 (global-set-key [(f9)]			'projectile-compile-project)
-;; F9, Use to be compile, but doesn	't use project root
+
+;; F9, Use to be compile, but who doesn't use project root
 ;; for invoking building commands these days?
 
 (global-set-key [(meta f9)]		'recompile)

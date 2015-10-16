@@ -131,6 +131,7 @@
  '(hl-line ((t (:inherit col-highlight :background "green4"))))
  '(lawlist-active-region-face ((t (:background "#3c3c3c"))))
  '(linum ((t (:inherit (shadow default) :background "#2a2a2a" :foreground "#778888"))))
+ '(magit-blame-heading ((t (:foreground "#808080"))))
  '(scroll-bar ((t (:background "#111111" :foreground "#999999"))))
  '(show-paren-match ((((class color) (background dark)) (:background "#262e4e"))))
  '(whitespace-indentation ((t (:background "#202020"))))
