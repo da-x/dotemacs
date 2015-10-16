@@ -1,5 +1,25 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; pair tests
+;;; test-helper.el --- Helper for tests.
+
+;; Copyright (C) 2015 Matus Goljer
+
+;; Author: Matus Goljer <matus.goljer@gmail.com>
+;; Maintainer: Matus Goljer <matus.goljer@gmail.com>
+;; Created: 4 Aug 2015
+
+;;; Commentary:
+
+;; Grab bag of utilities for running smartparens tests.
+
+;;; Code:
+
+(require 'ert)
+(require 'dash)
+(require 'f)
+(require 'cl-lib)
+
+(let ((sp-dir (f-parent (f-dirname (f-this-file)))))
+  (add-to-list 'load-path sp-dir))
+(require 'smartparens)
 
 (defvar sp--test-basic-pairs
   '((t
@@ -107,4 +127,5 @@ See `sp-test-with-temp-buffer'."
        (emacs-lisp-mode)
      ,@forms))
 
-(provide 'smartparens-test-env)
+(provide 'test-helper)
+;;; test-helper.el ends here

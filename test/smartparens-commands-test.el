@@ -1,13 +1,15 @@
-(require 'dash)
 (require 'smartparens-config)
 
 (defun sp-test-command-setup ()
   (cond
    ((not (boundp 'mode)) (emacs-lisp-mode))
    ((eq mode 'elisp) (emacs-lisp-mode))
+   ((eq mode 'racket) (racket-mode))
    ((eq mode 'c) (c-mode)))
   (smartparens-mode 1))
 
+;; TODO: don't use this, simply define the tests manually.  Gives more
+;; control and less magic
 (defmacro sp-test-command (command examples)
   (declare (indent 1))
   `(ert-deftest ,(intern (concat "sp-test-command-"
@@ -20,23 +22,28 @@
 
 (defun sp--test-command (command examples)
   "Run the test for COMMAND."
-  (cl-dolist (example examples)
-    (let ((before (car example)))
-      (cl-dolist (expected (cdr example))
-        (with-temp-buffer
-          (sp-test-command-setup)
-          (insert before)
-          (goto-char (point-min))
-          (search-forward "|")
-          (delete-char -1)
-          (call-interactively command)
-          (insert "|")
-          (cond
-           ((eq expected 'error)
-            (should (equal before (buffer-string))))
-           ((stringp expected)
-            (should (equal expected (buffer-string)))))
-          (setq before expected))))))
+  ;; TODO: get rid of this
+  (unless (and (boundp 'mode)
+               (eq mode 'racket)
+               (version<= "24.3" emacs-version))
+    (shut-up
+      (cl-dolist (example examples)
+        (let ((before (car example)))
+          (cl-dolist (expected (cdr example))
+            (with-temp-buffer
+              (sp-test-command-setup)
+              (insert before)
+              (goto-char (point-min))
+              (search-forward "|")
+              (delete-char -1)
+              (call-interactively command)
+              (insert "|")
+              (cond
+               ((eq expected 'error)
+                (should (equal before (buffer-string))))
+               ((stringp expected)
+                (should (equal expected (buffer-string)))))
+              (setq before expected))))))))
 
 (sp-test-command sp-forward-sexp
   ((nil
@@ -172,7 +179,10 @@
    (((mode 'c))
     ("int funct() { int |foo =} bar;" "int funct() { int |foo = bar;}")
     ("int funct() { int |foo =}; bar" "int funct() { int |foo = bar};")
-    ("int funct() { int |foo =}; bar;" "int funct() { int |foo = bar;};"))))
+    ("int funct() { int |foo =}; bar;" "int funct() { int |foo = bar;};"))
+   (((mode 'racket)
+     (sp-sexp-prefix '((racket-mode regexp "#?['`,]@?"))))
+    ("(f|oo)  #'(bar)" "(f|oo  #'(bar))"))))
 
 (sp-test-command sp-backward-slurp-sexp
   ((nil
@@ -192,7 +202,11 @@
      "(f|oo)\nbar ;; baz (foo) baz\n(quux)")
 
     ("(foo)\nbar ;; baz (f|oo baz)\n(quux)"
-     "(foo)\nbar ;; baz (f|oo) baz\n(quux)"))))
+     "(foo)\nbar ;; baz (f|oo) baz\n(quux)"))
+
+   (((mode 'racket)
+     (sp-sexp-prefix '((racket-mode regexp "#?['`,]@?"))))
+    ("(f|oo  #'(bar))" "(f|oo)  #'(bar)"))))
 
 (sp-test-command sp-backward-barf-sexp
   ((nil
@@ -240,10 +254,10 @@
     ("(f (|   ;xy\n    h))" "(f |   ;xy\n h)")
     ("(f ( |  ;xy\n    h))" "(f  |  ;xy\n h)")
     ("(f (  | ;xy\n    h))" "(f   | ;xy\n h)")
-    ("(f (   |;xy\n    h))" "(f |   ;xy\n h)")
-    ("(f (   ;|xy\n    h))" "(f |   ;xy\n h)")
-    ("(f (   ;x|y\n    h))" "(f |   ;xy\n h)")
-    ("(f (   ;xy|\n    h))" "(f |   ;xy\n h)")
+    ("(f (   |;xy\n    h))" "(f    |;xy\n h)")
+    ("(f (   ;|xy\n    h))" "(f    ;|xy\n h)")
+    ("(f (   ;x|y\n    h))" "(f    ;x|y\n h)")
+    ("(f (   ;xy|\n    h))" "(f    ;xy|\n h)")
     ("(f (   ;xy\n|    h))" "(f    ;xy\n| h)")
     ("(f (   ;xy\n |   h))" "(f    ;xy\n |h)")
     ("(f (   ;xy\n  |  h))" "(f    ;xy\n |h)")
@@ -270,13 +284,75 @@
     ("  (foo ((bar\n         b|az)\n        quux)\n zot)"
      "(foo (bar\n      b|az\n        quux)\n zot)"))))
 
+(sp-test-command sp-splice-sexp-killing-backward
+  ((nil
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n a|sd\n )" "|asd")
+
+    ;; if we are in front of a comment which is on a separate line,
+    ;; keep it as it most likely pertains to the line after
+    ("(\n    ;; foo bar\n asd\n as\n |;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+    ("(\n    ;; foo bar\n asd\n as\n ;; as|ds (asdasd asd hgujirjf) asd\n asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+
+    ;; valid sexps inside comments should be treated as such
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd |hgujirjf) asd\n asd\n )" "(\n    ;; foo bar\n asd\n as\n ;; asds |hgujirjf asd\n asd\n )")
+
+    ;; if first "form" is a comment, keep it
+    ("(\n  |  ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; foo bar\nasd\nas\n;; asds (asdasd asd hgujirjf) asd\nasd")
+
+    ;; keep comment before the form from which we are splicing if it is on a separate line
+    ("(\n    ;; foo bar\n |asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; foo bar\nasd\nas\n;; asds (asdasd asd hgujirjf) asd\nasd")
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n |asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+
+    ;; when at the end of the expression, kill entire expression
+    ("(asdad asd (some-func) asdasd|)" "|")
+    ("(asdad asd (some-func) asdasd|  )" "|")
+    ("(asdad asd (some-func) asdasd  |)" "|")
+    ("(asdad asd (some-func) asdasd  |  )" "|")
+    ("foo (asdad asd (some-func) asdasd|)" "foo |")
+    ("foo (asdad asd (some-func) asdasd|) bar" "foo | bar")
+
+    ;; when there is a comment before the parent sexp and we are at
+    ;; the beginning, the comment shouldn't play any role
+    (";; foo bar\n\n(|foo bar baz)" ";; foo bar\n\n|foo bar baz")
+    )))
+
+(sp-test-command sp-splice-sexp-killing-around
+  ((nil
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n a|sd\n )" "|asd")
+
+    ;; if we are in front of a comment which is on a separate line,
+    ;; keep it as it most likely pertains to the line after
+    ("(\n    ;; foo bar\n asd\n as\n |;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+    ("(\n    ;; foo bar\n asd\n as\n ;; as|ds (asdasd asd hgujirjf) asd\n asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+
+    ;; valid sexps inside comments should be treated as such
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd |hgujirjf) asd\n asd\n )" "(\n    ;; foo bar\n asd\n as\n ;; asds |hgujirjf asd\n asd\n )")
+
+    ;; if first "form" is a comment, keep it
+    ("(\n  |  ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; foo bar\nasd")
+
+    ;; keep comment before the form from which we are splicing if it is on a separate line
+    ("(\n    ;; foo bar\n |asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n asd\n )" "|;; foo bar\nasd")
+    ("(\n    ;; foo bar\n asd\n as\n ;; asds (asdasd asd hgujirjf) asd\n |asd\n )" "|;; asds (asdasd asd hgujirjf) asd\nasd")
+    )))
+
 (sp-test-command sp-split-sexp
   ((nil
     ("(foo |bar baz)" "(foo) |(bar baz)")
     ("(foo bar|)" "(foo bar)|()")
 
+    ("\"foo |bar baz\"" "\"foo \"|\"bar baz\"")
+    ("\"foo bar|\"" "\"foo bar\"|\"\"")
+
+    ("\"(foo |bar) baz\"" "\"(foo \"|\"bar) baz\"")
+    )
+
+   (((sp-split-sexp-always-split-as-string nil))
     ("\"foo |bar baz\"" "\"foo\" |\"bar baz\"")
-    ("\"foo bar|\"" "\"foo bar\"|\"\""))
+    ("\"foo bar|\"" "\"foo bar\"|\"\"")
+
+    ("\"(foo |bar) baz\"" "\"(foo) |(bar) baz\"")
+    )
 
    (((current-prefix-arg '(4)))
     ("(foo |bar baz)" "(foo) |(bar) (baz)")
@@ -364,5 +440,3 @@
     ("(foo\n bar| (baz\n      qux))" "(foo\n bar ;; |\n (baz\n  qux))")
     ("(foo\n bar |(baz\n      qux))" "(foo\n bar ;; |\n (baz\n  qux))")
     ("(foo\n bar (baz\n      |qux))" "(foo\n bar (baz\n      ;; |qux\n      ))"))))
-
-(provide 'smartparens-test-commands)
