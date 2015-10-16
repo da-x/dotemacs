@@ -63,6 +63,14 @@
 ;; Smart-parens
 (require 'smartparens)
 
+(defun my/sp-sexp-replace-from-kill-ring (&rest args)
+  (interactive)
+  (sp-kill-sexp)
+  (pop kill-ring)
+  (save-excursion
+    (insert (current-kill 1)))
+  )
+
 (savehist-mode 1)
 (setq savehist-file (in-emacs-d ".savehist"))
 (if (file-exists-p savehist-file)
@@ -724,6 +732,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-unset-key	(kbd "M-c"))   ;; capitalize-word
 (global-set-key         (kbd "M-c")    'helm-projectile-find-file-dwim)
 (global-unset-key	(kbd "M-f"))   ;; forward-word
+(global-set-key	        (kbd "M-f")    'my/sp-sexp-replace-from-kill-ring)
 (global-unset-key	[(control p)]) ;; previous-line
 (global-set-key		[(control p)]  'goto-last-change)
 (global-unset-key	(kbd "C--"))   ;; negative-arugment

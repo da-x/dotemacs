@@ -85,6 +85,7 @@
      (ff-search-directories "include"))))
  '(show-paren-style (quote expression))
  '(show-trailing-whitespace t)
+ '(sp-no-reindent-after-kill-modes (quote (coffee-mode js2-mode haskell-mode)))
  '(switch-to-buffer-preserve-window-point (quote already-displayed))
  '(whitespace-display-mappings nil)
  '(whitespace-style
