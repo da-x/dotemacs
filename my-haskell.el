@@ -188,6 +188,13 @@
 ;; (require 'stack-mode)
 ;; (add-hook 'haskell-mode-hook 'my/enable-stack-mode)
 
+(defun my/haskell-splice-with-dollar ()
+  "Turn (...) to $ ..."
+  (interactive)
+  (insert "$ ")
+  (goto-char (+ (point) 1))
+  (sp-splice-sexp)
+  )
 
 (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)

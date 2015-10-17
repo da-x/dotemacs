@@ -64,6 +64,7 @@
 (require 'smartparens)
 
 (defun my/sp-sexp-replace-from-kill-ring (&rest args)
+  "Replace current s-expression with the last copied string"
   (interactive)
   (sp-kill-sexp)
   (pop kill-ring)
@@ -849,7 +850,7 @@ grep search results buffers."
 
 (defun my/haskell-mode-keys ()
   (interactive)
-
+  (define-key haskell-mode-map (kbd "C-$")		'my/haskell-splice-with-dollar)
   (define-key haskell-mode-map (kbd "C-c i")		'hindent/reformat-decl)
   (define-key haskell-mode-map [f8]			'haskell-navigate-imports)
   (define-key haskell-mode-map (kbd "C-c C-u")		'haskell-insert-undefined)
