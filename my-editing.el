@@ -196,5 +196,56 @@
   (align-regexp (region-beginning) (region-end) "\\(\\s-*\\)\\()[ \t]*;\\)" 1 1 t)
   )
 
+(require 'thingatpt)
+
+(defvar my/replacer-saved-str)
+(defvar my/replacer-history nil)
+
+(defun my/replacer-save-str (THING)
+  "Remember the symbol at point as the THING to replace."
+
+  (interactive)
+  (let (s)
+    (progn
+      (setq s (thing-at-point THING))
+      (setq my/replacer-saved-str s)
+      (message (format "Saved replace string '%s'" s))
+      ))
+  )
+
+(defun my/replacer-with-saved-str ()
+  "Automatically replace the remembered string with the provided string,
+   either in the marked region or the whole buffer"
+
+  (interactive)
+  (let (b e s)
+    (progn
+      (if (and transient-mark-mode mark-active)
+	  (progn
+	    (setq b (region-beginning))
+	    (setq e (region-end))
+	    (setq s "region")
+	    )
+	  (progn
+	    (setq b (point-min))
+	    (setq e (point-max))
+	    (setq s "WHOLE BUFFER")
+	    ))
+
+      (let ((q (read-from-minibuffer
+		(format "Replacing in %s, '%s' with: " s my/replacer-saved-str)
+		nil nil nil
+		my/replacer-history "" t)))
+	(save-excursion
+	  (goto-char b)
+	  (while (and (re-search-forward my/replacer-saved-str nil t)
+		      (< (point) e))
+	    (replace-match q nil nil)
+	    (setq e (+ e (- (length q) (length my/replacer-saved-str))))
+	    ))
+	))
+  )
+)
+
 (provide 'my-editing)
 ;;; my-editing.el ends here
