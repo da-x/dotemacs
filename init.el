@@ -744,7 +744,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key         (kbd "C-]")    'my/append-to-kill-ring)
 (global-unset-key	(kbd "C-@"))   ;; set-mark-command
 (global-unset-key	(kbd "C-_"))   ;; undo
-(alobal-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
+(global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
 (global-set-key   	(kbd "M-i RET")  'replace-string)
 (global-set-key   	(kbd "M-i -")  (lambda () (interactive) (my/replacer-save-str 'word)))
 (global-set-key   	(kbd "M-i 0")  (lambda () (interactive) (my/replacer-save-str 'symbol)))
