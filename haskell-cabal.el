@@ -451,11 +451,19 @@ OTHER-WINDOW use `find-file-other-window'."
       (with-temp-buffer
 	(insert-file-contents cabal-file)
 	(haskell-cabal-mode)
-	(let (matches)
-	  (goto-char (point-min))
+	(goto-char (point-min))
+	(let ((matches)
+	      (projectName (haskell-cabal-get-setting "name")))
 	  (haskell-cabal-next-section)
 	  (while (not (eobp))
-	    (push (haskell-cabal-section-value (haskell-cabal-section)) matches)
+	    (if (haskell-cabal-source-section-p (haskell-cabal-section))
+		(let ((val (car (split-string
+				 (haskell-cabal-section-value (haskell-cabal-section))))))
+		  (if (or (string= val "")
+			  (string= val "{")
+			  (not val))
+		      (push projectName matches)
+		    (push val matches))))
 	    (haskell-cabal-next-section))
 	  (reverse matches))))))
 

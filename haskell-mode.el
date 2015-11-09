@@ -139,6 +139,7 @@
 (require 'haskell-lexeme)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
+(require 'haskell-indentation)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -656,7 +657,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'forward-sexp-function) #'haskell-forward-sexp)
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
-  (set (make-local-variable 'indent-line-function) 'haskell-mode-suggest-indent-choice)
+
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)
        'haskell-doc-current-info)
@@ -678,6 +679,7 @@ Minor modes that work well with `haskell-mode':
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
+  (set (make-local-variable 'comment-auto-fill-only-comments) t)
   ;; Haskell is not generally suitable for electric indentation, since
   ;; there is no unambiguously correct indent level for any given line.
   (when (boundp 'electric-indent-inhibit)
@@ -692,7 +694,7 @@ Minor modes that work well with `haskell-mode':
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
-  )
+  (haskell-indentation-mode))
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
@@ -808,116 +810,6 @@ Note that negative arguments do not work so well."
 ;;;###autoload
 (add-to-list 'completion-ignored-extensions ".hi")
 
-;;;###autoload
-(defcustom haskell-hoogle-command
-  (if (executable-find "hoogle") "hoogle")
-  "Name of the command to use to query Hoogle.
-If nil, use the Hoogle web-site."
-  :group 'haskell
-  :type '(choice (const :tag "Use Web-site" nil)
-                 string))
-
-;;;###autoload
-(defcustom haskell-hoogle-url "http://haskell.org/hoogle/?q=%s"
-  "Default value for hoogle web site.
-"
-  :group 'haskell
-  :type '(choice
-          (const :tag "haskell-org" "http://haskell.org/hoogle/?q=%s")
-          (const :tag "fp-complete" "https://www.fpcomplete.com/hoogle?q=%s")
-          string))
-
-;;;###autoload
-(defun haskell-hoogle (query &optional info)
-  "Do a Hoogle search for QUERY.
-When `haskell-hoogle-command' is non-nil, this command runs
-that.  Otherwise, it opens a hoogle search result in the browser.
-
-If prefix argument INFO is given, then `haskell-hoogle-command'
-is asked to show extra info for the items matching QUERY.."
-  (interactive
-   (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
-     (list (read-string (if def
-                            (format "Hoogle query (default %s): " def)
-                          "Hoogle query: ")
-                        nil nil def)
-           current-prefix-arg)))
-  (if (null haskell-hoogle-command)
-      (browse-url (format haskell-hoogle-url (url-hexify-string query)))
-    (with-help-window "*hoogle*"
-      (with-current-buffer standard-output
-	(insert (shell-command-to-string
-		 (concat haskell-hoogle-command
-			 (if info " -i " "")
-			 " --color " (shell-quote-argument query))))
-	(ansi-color-apply-on-region (point-min) (point-max))))))
-
-;;;###autoload
-(defalias 'hoogle 'haskell-hoogle)
-
-(defvar hoogle-server-process-name "emacs-local-hoogle")
-(defvar hoogle-server-buffer-name (format "*%s*" hoogle-server-process-name))
-(defvar hoogle-port-number 49513 "Port number.")
-
-(defun hoogle-start-server ()
-  "Start hoogle local server."
-  (interactive)
-  (unless (hoogle-server-live-p)
-    (start-process
-     hoogle-server-process-name
-     (get-buffer-create hoogle-server-buffer-name) "/bin/sh" "-c"
-     (format "hoogle server -p %i" hoogle-port-number))))
-
-(defun hoogle-server-live-p ()
-  "Whether hoogle server is live or not."
-  (condition-case _err
-      (process-live-p (get-buffer-create hoogle-server-buffer-name))
-    (error nil)))
-
-(defun hoogle-kill-server ()
-  "Kill hoogle server if it is live."
-  (interactive)
-  (when (hoogle-server-live-p)
-    (kill-process (get-buffer-create hoogle-server-buffer-name))))
-
-;;;###autoload
-(defun hoogle-lookup-from-local ()
-  "Lookup by local hoogle."
-  (interactive)
-  (if (hoogle-server-live-p)
-      (browse-url (format "http://localhost:%i/?hoogle=%s"
-                          hoogle-port-number
-                          (read-string "hoogle: " (haskell-ident-at-point))))
-    (when (y-or-n-p
-           "hoogle server not found, start hoogle server?")
-      (if (executable-find "hoogle")
-          (hoogle-start-server)
-        (error "hoogle is not installed")))))
-
-;;;###autoload
-(defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
-  "Default value for hayoo web site.
-"
-  :group 'haskell
-  :type '(choice
-          (const :tag "fh-wedel.de" "http://hayoo.fh-wedel.de/?query=%s")
-          string))
-
-;;;###autoload
-(defun haskell-hayoo (query)
-  "Do a Hayoo search for QUERY."
-  (interactive
-   (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
-     (list (read-string (if def
-                            (format "Hayoo query (default %s): " def)
-                          "Hayoo query: ")
-                        nil nil def))))
-  (browse-url (format haskell-hayoo-url (url-hexify-string query))))
-
-;;;###autoload
-(defalias 'hayoo 'haskell-hayoo)
 
 ;;;###autoload
 (defcustom haskell-check-command "hlint"
@@ -974,14 +866,6 @@ To be added to `flymake-init-create-temp-buffer-copy'."
                          'flymake-create-temp-inplace))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
-
-(defun haskell-mode-suggest-indent-choice ()
-  "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
-Explains what has happened and suggests reading docs for `haskell-mode-hook'."
-  (interactive)
-  (error "You tried to do an indentation command, but an indentation mode has not been enabled yet.
-
-Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (defun haskell-mode-format-imports ()
   "Format the imports by aligning and sorting them."
