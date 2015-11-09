@@ -69,7 +69,8 @@ You can create new session using function `haskell-session-make'."
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
-    (unless (eq 'cabal-repl (haskell-process-type)) ;; "cabal repl" sets the proper CWD
+    (unless (or (eq 'cabal-repl (haskell-process-type))
+                   (eq 'stack-ghci (haskell-process-type))) ;; Both "cabal repl" and "stack ghci" set the proper CWD.
       (haskell-process-change-dir session
                                   process
                                   (haskell-session-current-dir session)))
@@ -87,9 +88,11 @@ You can create new session using function `haskell-session-make'."
     :state process
 
     :go (lambda (process)
-          (haskell-process-send-string process ":set prompt \"\\4\"")
+          ;; We must set the prompt last, so that this command as a
+          ;; whole produces only one prompt marker as a response.
           (haskell-process-send-string process "Prelude.putStrLn \"\"")
-          (haskell-process-send-string process ":set -v1"))
+          (haskell-process-send-string process ":set -v1")
+          (haskell-process-send-string process ":set prompt \"\\4\""))
 
     :live (lambda (process buffer)
             (when (haskell-process-consume
@@ -143,29 +146,17 @@ If I break, you can:
 Restores -fobject-code after reload finished.
 MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   (haskell-process-queue-without-filters process ":set -fbyte-code")
-  (haskell-process-touch-buffer process module-buffer)
-  (haskell-process-queue-without-filters process ":reload")
-  (haskell-process-queue-without-filters process ":set -fobject-code"))
-
-;;;###autoload
-(defun haskell-process-touch-buffer (process buffer)
-  "Query PROCESS to `:!touch` BUFFER's file.
-Use to update mtime on BUFFER's file."
-  (interactive)
-  (haskell-process-queue-command
+  ;; We prefix the module's filename with a "*", which asks ghci to
+  ;; ignore any existing object file and interpret the module.
+  ;; Dependencies will still use their object files as usual.
+  (haskell-process-queue-without-filters
    process
-   (make-haskell-command
-    :state (cons process buffer)
-    :go (lambda (state)
-          (haskell-process-send-string
-           (car state)
-           (format ":!%s %s"
-                   "touch"
-                   (shell-quote-argument (buffer-file-name
-                                          (cdr state))))))
-    :complete (lambda (state _)
-                (with-current-buffer (cdr state)
-                  (clear-visited-file-modtime))))))
+   (format ":load \"*%s\""
+           (replace-regexp-in-string
+            "\""
+            "\\\\\""
+            (buffer-file-name module-buffer))))
+  (haskell-process-queue-without-filters process ":set -fobject-code"))
 
 (defvar url-http-response-status)
 (defvar url-http-end-of-headers)
@@ -364,12 +355,7 @@ position with `xref-pop-marker-stack'."
         (haskell-mode-handle-generic-loc loc)
       (call-interactively 'haskell-mode-tag-find))
     (unless (equal initial-loc (point-marker))
-      (with-current-buffer (marker-buffer initial-loc)
-        (save-excursion
-          (goto-char initial-loc)
-          (set-mark-command nil)
-          ;; Store position for return with `xref-pop-marker-stack'
-          (xref-push-marker-stack))))))
+      (xref-push-marker-stack initial-loc))))
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()
@@ -719,16 +705,14 @@ function `xref-find-definitions' after new table was generated."
                (format ":!cd %s && %s | %s"
                        (haskell-session-cabal-dir
                         (haskell-process-session (car state)))
-                       "find . -name '*.hs' -print0 -or -name '*.lhs' -print0 -or -name '*.hsc' -print0"
+                       "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state _response)
                   (when (cdr state)
-                    (let ((session-tags
-                          (haskell-session-tags-filename
-                           (haskell-process-session (car state)))))
-                      (add-to-list 'tags-table-list session-tags)
-                      (setq tags-file-name nil))
-                    (xref-find-definitions (cdr state)))
+                    (let ((tags-file-name
+                           (haskell-session-tags-filename
+                            (haskell-process-session (car state)))))
+                      (xref-find-definitions (cdr state))))
                   (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-add-cabal-autogen ()

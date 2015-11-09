@@ -25,7 +25,10 @@
 (require 'cl-lib)
 (require 'ert)
 (require 'haskell-mode)
+(require 'haskell-font-lock)
 (require 'haskell-indentation)
+(require 'haskell-indent)
+(require 'haskell-simple-indent)
 
 ;;; Code:
 
@@ -70,6 +73,7 @@ because it helps increase coverage."
         (haskell-indentation-mode 1)
         (insert source)
         (newline)
+        (font-lock-fontify-buffer)
         (goto-char (point-min))
         (forward-line (1- line))
         (move-to-column column)
@@ -111,12 +115,37 @@ macro quotes them for you."
                       (list 'quote x))
                     test-cases))))))
 
+(ert-deftest haskell-indentation-turns-off-haskell-indent ()
+  (with-temp-buffer
+    (haskell-mode)
+    (haskell-indent-mode)
+    (should haskell-indent-mode)
+    (haskell-indentation-mode)
+    (should haskell-indentation-mode)
+    (should-not haskell-indent-mode)
+
+    (haskell-indent-mode)
+    (should-not haskell-indentation-mode)
+    (should haskell-indent-mode)))
+
+(ert-deftest haskell-indentation-turns-off-haskell-simple-indent ()
+  (with-temp-buffer
+    (haskell-mode)
+    (haskell-simple-indent-mode)
+    (should haskell-simple-indent-mode)
+    (haskell-indentation-mode)
+    (should haskell-indentation-mode)
+    (should-not haskell-simple-indent-mode)
+
+    (haskell-simple-indent-mode)
+    (should-not haskell-indentation-mode)
+    (should haskell-simple-indent-mode)))
+
 (hindent-test "1 Check if '{' on its own line gets properly indented""
 function = Record
        { field = 123 }"
   ((1 0) 0)
-  ((2 0) 0 11)
-  ((3 0) 0 7))
+  ((2 0) 0 11))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -150,37 +179,37 @@ function = do
   ((2 0) 2)
   ((3 0) 0 2 11))
 
-(hindent-test "3* Import statememnt symbol list 1""
+(hindent-test "3 Import statememnt symbol list 1""
 import Control.Concurrent
-  ( forkIO,
-    killThread )"
+       ( forkIO,
+         killThread )"
   ((1 0) 0)
-  ((2 0) 0 2)
-  ((3 0) 4)
-  ((4 0) 0))
+  ((2 0) 0 7)
+  ((3 0) 9)
+  ((4 0) 0 7))
 
-(hindent-test "4* Import statememnt symbol list 2""
+(hindent-test "4 Import statememnt symbol list 2""
 import Control.Concurrent
-  ( forkIO
-  , killThread )"
+       ( forkIO
+       , killThread )"
   ((1 0) 0)
-  ((2 0) 0 2)
-  ((3 0) 2)
-  ((4 0) 0))
+  ((2 0) 0 7)
+  ((3 0) 7)
+  ((4 0) 0 7))
 
-(hindent-test "5* List comprehension""
+(hindent-test "5 List comprehension""
 fun = [ x | y
           , z ]"
   ((1 0) 0)
   ((2 0) 10)
-  ((3 0) 0))
+  ((3 0) 0 6))
 
 (hindent-test "5a* List comprehension""
 fun = [ x | y,
             z ]"
   ((1 0) 0)
   ((2 0) 12)
-  ((3 0) 0))
+  ((3 0) 0 6))
 
 (hindent-test "6* \"let\" in list comprehension""
 fun = [ f | x <- xs
@@ -191,7 +220,7 @@ fun = [ f | x <- xs
   ((2 0) 10)
   ((3 0) 10)
   ((4 0) 10)
-  ((5 0) 0))
+  ((5 0) 0 6))
 
 (hindent-test "6u* \"let\" in list comprehension""
 fun = [ f | x ← xs
@@ -204,12 +233,24 @@ fun = [ f | x ← xs
   ((4 0) 10)
   ((5 0) 0))
 
-(hindent-test "7* \"import\" after \"import\"""
+(hindent-test "7a \"data\" after \"data\"""
+data ABC = ABC
+data DEF = DEF"
+  ((1 0) 0)
+  ((2 0) 0))
+
+(hindent-test "7 \"import\" after \"import\"""
 import ABC
 import DEF"
   ((1 0) 0)
   ((2 0) 0)
-  ((3 0) 0))
+  ((3 0) 0 7))
+
+(hindent-test "7b* declaration after declaration" "
+fun1 = undefined
+fun2 = undefined"
+  ((1 0) 0)
+  ((2 0) 0))
 
 (hindent-test "8* Guards in function definition""
 resolve (amount, max) number
@@ -231,30 +272,30 @@ fun = x
   ((1 0) 0)
   ((2 0) 0 6))
 
-(hindent-test "11* Guards with commas""
+(hindent-test "11 Guards with commas""
 clunky env var1 var2
   | Just val1 <- lookup env var1
   , Just val2 <- lookup env var2"
   ((1 0) 0)
   ((2 0) 2)
-  ((3 0) 0 2)
-  ((4 0) 0 2))
+  ((3 0) 2)
+  ((4 0) 0 17))
 
-(hindent-test "11u* Guards with commas""
+(hindent-test "11u Guards with commas""
 clunky env var1 var2
   | Just val1 ← lookup env var1
   , Just val2 ← lookup env var2"
   ((1 0) 0)
   ((2 0) 2)
-  ((3 0) 0 2)
-  ((4 0) 0 2))
+  ((3 0) 2)
+  ((4 0) 0 16))
 
 (hindent-test "12 \"do\" as expression""
 fun = do { putStrLn \"X\";
          }"
   ((1 0) 0)
   ((2 0) 9 11)
-  ((3 0) 0 6))
+  ((3 0) 0))
 
 (hindent-test "13* Don't indent after deriving""
 data X = X
@@ -284,23 +325,23 @@ fun = do
   ((4 0) 4)
   ((5 0) 2 4))
 
-(hindent-test "16* Lambda and a \"do\" block""
-fun = \x -> do"
+(hindent-test "16 Lambda and a \"do\" block""
+fun = \\x -> do"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16a* A lambda""
-fun = \x ->"
+(hindent-test "16a A lambda""
+fun = \\x ->"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16u* Lambda and a do block""
-fun = \x → do"
+(hindent-test "16u Lambda and a do block""
+fun = \\x → do"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16au* A lambda""
-fun = \x →"
+(hindent-test "16au A lambda""
+fun = \\x →"
   ((1 0) 0)
   ((2 0) 2))
 
@@ -518,4 +559,202 @@ func = 1234
   ((4 0) 0 4 11)
   ((5 0) 6))
 
+(hindent-test "23* should not fail when seeing comments" "
+-- important non-empty line
+{-
+-}"
+  ((3 2) 0))
+
+(hindent-test "24 should parse inline type signatures properly" "
+foo = do
+  _ :: String <- undefined
+  _ :: String <- undefined
+  return ()"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 0 2 17)
+              ((4 0) 0 2 17))
+
+(hindent-test "25a* support scoped type declarations" "
+foo = do
+  bar :: String
+      -> String
+    <- undefined"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 6 9)
+              ;; here it brakes, it would like to put '<-' on same line with 'bar'
+              ;; the culprit is the 'do' keyword
+              ((4 0) 4))
+
+(hindent-test "25b support scoped type declarations" "
+foo = let
+  bar :: String
+      -> String
+    = undefined"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 6 9)
+              ((4 0) 4))
+
+(hindent-test "26 should parse unindented where-clause properly" "
+foo = do
+    return ()
+  where
+    bar = undefined"
+              ((4 0) 4))
+              
+(hindent-test "27* expecting then (GH-884)" "
+foo = do
+    if True
+    then return ()
+"
+              ((4 0) 4))
+
+(hindent-test "28a names starting with quotes" "
+f = a (a 'A)
+    (a 'A)
+"
+              ((2 0) 0 4))
+
+(hindent-test "28b character literal (escape sequence)" "
+f = '\\\\'
+
+"
+              ((2 0) 0 4))
+
+
+(hindent-test "28c name starting with a quote" "
+function (Operation 'Init) = do
+  print 'Init
+"
+              ((2 0) 2))
+
+(hindent-test "29a quasiquote single line" "
+test = [randomQQ| This is a quasiquote with the word in |]
+
+"
+              ((2 0) 0 7))
+
+(hindent-test "29b quasiquote multiple lines" "
+test = [randomQQ| This is
+          a quasiquote
+          with the word in |]
+
+"
+              ((4 0) 0 7))
+(hindent-test "30* parse '[] identifier correctly" "
+instance Callable '[]
+"
+	      ((1 0) 2))
+(hindent-test "31* allow type class declaration without methods" "
+class Foo a where
+instance Bar Int
+"
+	      ((2 0) 0))
+(hindent-test "32 allow type operators" "
+data (:.) a b = a :. b
+"
+	      ((2 0) 0 16))
+(hindent-test "33* parse #else in CPP" "
+#ifdef FLAG
+foo = ()
+#else
+"
+	      ((4 0) 0))
+
+
+(hindent-test "34 beginning of line inside parentheses" "
+data T = T {
+  foo :: String
+, bar :: String
+}
+
+"
+              ;; set of answers isn't best but it is not a bug
+              ;; should be just 0
+              ((5 0) 0 9))
+
+(hindent-test "35 baroque construct which causes parse error" "
+az = Projection
+  { unproject = do
+        case x of
+          _ -> return
+  , maxR = pi
+  }
+"
+	      ((6 0) 2))
+
+(hindent-test "35a parse a backslash properly" "
+az = Projection
+  { unproject = \\x -> do
+        case x of
+          _ -> return
+  , maxR = pi
+  }
+"
+	      ((6 0) 2))
+
+(hindent-test "36 yet another parser failure" "
+tokOpenTag =
+  asum [ do void
+       , return
+       ]
+"
+	      ((4 0) 7))
+(hindent-test "37* Indent continuation lines in multiline string literal" "
+a = \"multiline\\
+"
+	      ((2 0) 4))
+
+(hindent-test "38 Indent in do block after multiline string literal" "
+s = do
+  a <- \"multiline\\
+       \\ line 2\"
+"
+       ((4 0) 0 2 7))
+
+(hindent-test "39 do not crash after two multiline literals in do block" "
+servePost = do
+  a <- fun \"line 1\\
+           \\line 2\"
+  b <- queryT \"comma is important: , \\
+             \\ line 2 \"
+"
+	      ((6 0) 0 2 7))
+
+(hindent-test "40 parse error in multiline tuple" "
+a = ( 1
+, "
+	      ((2 0) 4)
+	      ((2 2) 6))
+
+(hindent-test "41 open do inside a list" "
+x = asum [ withX $ do
+             return ()
+         ]
+"
+	      ((2 0) 13))
+
+(hindent-test "42 open do inside a list second element" "
+x = asum [ mzero
+         , withX $ do
+             return ()
+         ]
+"
+	      ((3 0) 13))
+
+(hindent-test "43 open do inside a list second element, reset alignment" "
+x = asum [ mzero
+             , withX $ do
+                 return ()
+         ]
+"
+	      ((3 0) 17))
+
+(hindent-test "44 expression continues, reset alignment" "
+function = abc
+       def
+       xyz"
+  ((3 0) 0 7))
 ;;; haskell-indentation-tests.el ends here
