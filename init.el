@@ -583,6 +583,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key (kbd "C-s-3")			'(lambda () (interactive) (workspace-goto ?3)))
 (global-set-key (kbd "C-s-4")			'(lambda () (interactive) (workspace-goto ?4)))
 
+(global-set-key (kbd "C-c <deletechar>")	'my/join-lines)
+
 (define-key c-mode-map (kbd "C-c u")		'my/c-toggle-unused)
 (define-key c-mode-map (kbd "C-c i")		'my/c-add-if)
 (define-key c-mode-map (kbd "C-c f")		'my/c-add-for)
@@ -591,7 +593,6 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 
 (global-set-key [(control d)]			'highlight-symbol-prev)
 (global-set-key [(control f)]			'highlight-symbol-next)
-(global-set-key (kbd "M-^")			'highlight-symbol-query-replace)
 
 (global-set-key [(control b)]			'helm-projectile-switch-to-buffer)
 (global-set-key [(control x) (control f)]	'helm-find-files)
@@ -862,6 +863,8 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-c C-a")		'haskell-insert-doc)
   (define-key haskell-mode-map (kbd "C-<return>")	'haskell-simple-indent-newline-indent)
   (define-key haskell-mode-map (kbd "<space>")		'haskell-mode-contextual-space)
+  (define-key haskell-mode-map (kbd "<delete>")		'my/delete-forward-char-preserve-alignment)
+
   (define-key haskell-mode-map [(f4)]			'haskell-goto-next-error)
   (define-key haskell-mode-map [(shift f4)]		'haskell-goto-prev-error)
   (define-key haskell-mode-map [(ctrl f4)]		'my/haskell-goto-first-error)

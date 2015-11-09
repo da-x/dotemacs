@@ -60,7 +60,9 @@
  '(magit-log-arguments (quote ("--color" "--decorate")))
  '(safe-local-variable-values
    (quote
-    ((c-continued-statement-offset . 4)
+    ((haskell-process-use-ghci . t)
+     (haskell-indent-spaces . 4)
+     (c-continued-statement-offset . 4)
      (c-label-offset . -4)
      (c-argdecl-indent . 4)
      (c-brace-offset . -4)

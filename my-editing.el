@@ -245,7 +245,40 @@
 	    ))
 	))
   )
+  )
+
+(defun my/delete-forward-char-preserve-alignment ()
+  (interactive)
+  "Delete but don't damage whitespace alignemnt"
+
+  (let (eol nls orig)
+    (progn
+      (setq orig (point))
+
+      (save-excursion (setq eol (search-forward "\n" nil t)))
+
+      (if (not (eq eol nil))
+	  (save-excursion (setq nls (search-forward "  " eol t))))
+
+      (if (and eol nls (not (eq (+ orig 2) nls)))
+	  (save-excursion
+	    (goto-char nls)
+	    (insert " ")
+	    )
+	)
+      ))
+
+  (delete-char 1)
 )
+
+(defun my/join-lines ()
+  (interactive "")
+
+  (end-of-line)
+  (delete-char 1)
+  (delete-horizontal-space)
+  (insert " ")
+  )
 
 (provide 'my-editing)
 ;;; my-editing.el ends here
