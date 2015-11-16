@@ -784,6 +784,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key [(shift ctrl f4)]	'flycheck-list-errors)
 
 (global-set-key [f5]			'switch-to-prev-buffer)
+(global-set-key [(meta f5)]		'switch-to-next-buffer)
 (global-set-key [(control f5)]		'ff-find-other-file)
 
 (global-set-key [f6]			'helm-ls-git-ls)
