@@ -29,7 +29,6 @@ processResult source_file (code, stdout, stderr) = do
   BS.putStr (BS.pack stdout)
   top_include <- IOR.newIORef Nothing
   forM_ rlines $ \line -> do
-
     case ((line =~ ("^(In file included from |                 from )([^:]+)[:]([0-9]+)"
                     :: BS.ByteString)) :: [[BS.ByteString]]) of
        [[_, _, filename, line_nr]] -> IOR.writeIORef top_include (Just (filename, line_nr))
@@ -43,7 +42,7 @@ processResult source_file (code, stdout, stderr) = do
                 do  included_from <- IOR.readIORef top_include
                     case (included_from, filename_in_line /= (BS.pack source_file)) of
                        (Just (filename, line_nr), True) ->
-                         BS.putStrLn $ BS.concat [ filename, ":", line_nr, ":0: ",
+                         BS.putStrLn $ BS.concat [ filename, ":", line_nr, ":1: ",
                                                    prefix, " (included) ",
                                                    filename_in_line, location, rest_of_line]
                        _ -> return ()

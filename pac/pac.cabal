@@ -19,14 +19,13 @@ executable pac
   main-is:             Pac.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.7 && <5
+  build-depends:       base >=4.7
                      , temporary
                      , directory
                      , filepath
                      , bytestring
                      , process
                      , stringsearch
-                     , regex-tdfa-utf8
                      , regex-tdfa
                      , regex-base
   hs-source-dirs:      src

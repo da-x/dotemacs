@@ -274,6 +274,9 @@
 (require 'flycheck-rust)
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
+;; Go
+(require 'go-mode)
+
 ;; D lang
 (require 'd-mode)
 (add-to-list 'auto-mode-alist '("\\.d[i]?\\'" . d-mode))

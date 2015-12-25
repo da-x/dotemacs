@@ -1,6 +1,4 @@
 flags: {}
 packages:
 - '.'
-extra-deps:
-- regex-tdfa-utf8-1.0
-resolver: lts-2.18
+resolver: lts-3.14
