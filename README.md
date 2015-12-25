@@ -22,7 +22,7 @@ Make sure you have this in your [init file](http://www.gnu.org/software/emacs/ma
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
- ```
+```
 
 Then run emacs, and evaluate:
 
@@ -106,7 +106,7 @@ make EMACS=/path/to/your/emacs
 If you followed the above you are just a couple of steps away from
 contributing to `haskell-mode`.
 
-`haskell-mode` is activelly seeking contributions from users of
+`haskell-mode` is actively seeking contributions from users of
 `haskell-mode`. For more information have a look at
 [the wiki page on contributing](https://github.com/haskell/haskell-mode/wiki/Contributing).
 

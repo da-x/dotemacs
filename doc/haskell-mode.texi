@@ -2,7 +2,7 @@
 @c %**start of header
 @setfilename haskell-mode.info
 @documentencoding UTF-8
-@settitle Haskell Mode 13.15-git
+@settitle Haskell Mode 13.17-git
 @c %**end of header
 
 @dircategory Emacs
@@ -11,7 +11,7 @@
 @end direntry
 
 @copying
-This manual is for Haskell mode, version 13.15-git
+This manual is for Haskell mode, version 13.17-git
 
 Copyright @copyright{} 2013 Haskell Mode contributors.
 
@@ -278,6 +278,15 @@ and available packages.
 @image{anim/company-mode-import-statement}
 @end ifhtml
 
+@section Profiling and Debugging support
+
+When profiling code with GHC, it is often useful to add
+@uref{https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres,
+cost centres} by hand.  These allow finer-grained information about
+program behavior.  @code{haskell-mode} provides the function
+@code{haskell-mode-toggle-scc-at-point} to make this more convenient.
+It will remove an SCC annotation at point if one is present, or add
+one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
 
 @node Unicode support
 @chapter Unicode support
@@ -341,12 +350,6 @@ trade-offs:
 
 @ftable @code
 
-@item haskell-simple-indent-mode
-
-A very simple indentation scheme; In this scheme, @key{TAB} will now
-move the cursor to the next indent point in the previous non-blank line.
-An indent point is a non-whitespace character following whitespace.
-
 @item haskell-indent-mode
 
 Intelligent semi-automatic indentation for Haskell's layout rule.  The
@@ -377,7 +380,6 @@ convenient user interface or by adding @emph{one} of the following three
 lines to your @file{.emacs} file:
 
 @lisp
-(add-hook 'haskell-mode-hook 'haskell-simple-indent-mode)
 (add-hook 'haskell-mode-hook 'haskell-indent-mode)
 (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 @end lisp
@@ -594,9 +596,17 @@ When invoked, @code{haskell-compile} tries to guess how to compile the
 Haskell program your currently visited buffer belongs to, by searching
 for a @file{.cabal} file in the current of enclosing parent folders. If
 a @file{.cabal} file was found, the command defined in the
-@code{haskell-compile-cabal-build-command} option is used. Moreover,
-when requesting to compile a @file{.cabal}-file is detected and a
-negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the
+@code{haskell-compile-cabal-build-command} option is used. Note that to
+compile a @code{stack} based project you will need to set this variable to
+@code{stack build}. As usual you can do it using @code{M-x customize-variable}
+or with:
+
+@lisp
+(setq haskell-compile-cabal-build-command "stack build")
+@end lisp
+
+Moreover, when requesting to compile a @file{.cabal}-file is detected and
+a negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the
 alternative @code{haskell-compile-cabal-build-command-alt} is
 invoked. By default, @code{haskell-compile-cabal-build-command-alt}
 contains a @samp{cabal clean -s} command in order to force a full
