@@ -10,7 +10,7 @@
 # We should have a script that changes it everywhere it is needed and
 # syncs it with current git tag.
 #
-VERSION = 13.15-git
+VERSION = 13.17-git
 
 INSTALL_INFO = install-info
 
@@ -23,13 +23,7 @@ INSTALL_INFO = install-info
 #
 # This is particularly useful when EMACS is set in ~/.bash_profile
 #
-EMACS := $(shell echo "$${EMACS:-emacs}")
-
-# Emacs itself sets the $EMACS environment variable to t if it is not
-# present, so we should ignore the variable if this is its value.
-ifeq ($(EMACS),t)
-EMACS := emacs
-endif
+EMACS := $(shell which "$${EMACS}" || which "emacs")
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
 	 --eval "(when (< emacs-major-version 24) \
@@ -44,13 +38,11 @@ ELFILES = \
 	ghci-script-mode.el \
 	highlight-uses-mode.el \
 	haskell-align-imports.el \
-	haskell-bot.el \
 	haskell-cabal.el \
 	haskell-checkers.el \
 	haskell-collapse.el \
 	haskell-modules.el \
 	haskell-sandbox.el \
-	haskell-cabal.el \
 	haskell-commands.el \
 	haskell-compat.el \
 	haskell-compile.el \
@@ -77,7 +69,6 @@ ELFILES = \
 	haskell-process.el \
 	haskell-repl.el \
 	haskell-session.el \
-	haskell-simple-indent.el \
 	haskell-sort-imports.el \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
