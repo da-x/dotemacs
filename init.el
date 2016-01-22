@@ -156,6 +156,7 @@
 
 (load-file (in-emacs-d "my-haskell.el"))
 (load-file (in-emacs-d "my-editing.el"))
+(load-file (in-emacs-d "my-colors.el"))
 
 ;; Shell
 
@@ -846,7 +847,7 @@ grep search results buffers."
   (interactive)
 
   (define-key interactive-haskell-mode-map [f7]			'my/haskell-process-load-or-reload)
-  (define-key interactive-haskell-mode-map [f12]		'haskell-process-reload-devel-main)
+  (define-key interactive-haskell-mode-map [(control f12)]	'haskell-process-reload-devel-main)
   (define-key interactive-haskell-mode-map (kbd "M-,")		'my/haskell-who-calls)
   (define-key interactive-haskell-mode-map (kbd "C-`")		'haskell-interactive-bring)
   (define-key interactive-haskell-mode-map (kbd "C-c C-k")	'haskell-interactive-mode-clear)
