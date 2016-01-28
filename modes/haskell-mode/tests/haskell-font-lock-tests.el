@@ -1,12 +1,11 @@
 (require 'ert)
+(require 'haskell-test-utils)
 (require 'haskell-font-lock)
 (require 'haskell-mode)
 
-(defun insert-lines (&rest lines)
-  (dolist (line lines)
-    (insert line)
-    (insert "\n")))
-
+;; Emacs 24.3 has sql-mode that runs without a product and therefore
+;; without font lock initially and needs to be extra enabled
+(add-hook 'sql-mode-hook (lambda () (sql-set-product 'ansi)))
 
 (defun check-syntax-and-face-match-range (beg end syntax face)
   "Check if all charaters between positions BEG and END have
@@ -51,7 +50,7 @@ after a test as this aids interactive debugging."
        (haskell-mode)
        ,@body)))
 
-(defun check-properties (lines props)
+(defun check-properties (lines props &optional literate)
   "Check if syntax properties and font-lock properties as set properly.
 
 LINES is a list of strings that will be inserted to a new
@@ -63,10 +62,12 @@ if all of its characters have syntax and face. See
     (kill-buffer "*haskell-mode-buffer*"))
   (save-current-buffer
     (set-buffer (get-buffer-create "*haskell-mode-buffer*"))
-    (haskell-mode)
     (dolist (line lines)
       (insert line)
       (insert "\n"))
+    (if literate
+        (literate-haskell-mode)
+      (haskell-mode))
     (font-lock-fontify-buffer)
     (goto-char (point-min))
     (dolist (prop props)
@@ -248,7 +249,7 @@ if all of its characters have syntax and face. See
   (check-properties
    '("[qq| \\|]  Cons")
    '(("qq" "w" nil)
-     ("\\" "." font-lock-string-face)
+     ("\\" "." haskell-quasi-quote-face)
      ("Cons" "w" haskell-constructor-face))))
 
 (ert-deftest haskell-syntactic-quasiquote-three-punctuation ()
@@ -256,10 +257,10 @@ if all of its characters have syntax and face. See
   (check-properties
    '("[qq| %\\|]  Cons")
    '(("qq" "w" nil)
-     ("%\\" "." font-lock-string-face)
+     ("%\\" "." haskell-quasi-quote-face)
      ("Cons" "w" haskell-constructor-face))))
 
-(ert-deftest haskell-syntactic-test-11 ()
+(ert-deftest haskell-syntactic-test-11a ()
   "Syntax for haddock comments"
   (check-properties
    '(" -- | Dcom1"                      ; haddocks
@@ -304,7 +305,7 @@ if all of its characters have syntax and face. See
      ("Dcom17" "w" font-lock-doc-face)
      )))
 
-(ert-deftest haskell-syntactic-test-11 ()
+(ert-deftest haskell-syntactic-test-11b ()
   "Syntax for haddock comments"
   ;; Note: all of these are prefixed with space so that
   ;; top-level definition detection does not kick in.
@@ -358,9 +359,9 @@ if all of its characters have syntax and face. See
   (check-properties
    '("v = [quoter| string |] Cons")
    '(("[" t nil)
-     ("|" t font-lock-string-face)
-     ("string" t font-lock-string-face)
-     ("|" t font-lock-string-face)
+     ("|" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Cons" "w" haskell-constructor-face))))
 
@@ -372,41 +373,41 @@ if all of its characters have syntax and face. See
      " finishing line"
      "|] Cons")
    '(("[" t nil)
-     ("|" t font-lock-string-face)
-     ("string" t font-lock-string-face)
-     ("line" t font-lock-string-face)
-     ("|" t font-lock-string-face)
+     ("|" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("line" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Cons" "w" haskell-constructor-face))))
 
-(ert-deftest haskell-syntactic-test-quasiquoter-2 ()
+(ert-deftest haskell-syntactic-test-quasiquoter-3 ()
   "QuasiQuote inside quasi quote"
   (check-properties
    '("v = [quoter| [inner| string {- -- |] Outside |]")
    '(("[" t nil)
-     ("|" t font-lock-string-face)
-     ("inner" t font-lock-string-face)
-     ("string" t font-lock-string-face)
-     ("|" t font-lock-string-face)
+     ("|" t haskell-quasi-quote-face)
+     ("inner" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Outside" "w" haskell-constructor-face)
      )))
 
-(ert-deftest haskell-syntactic-test-quasiquoter-3 ()
+(ert-deftest haskell-syntactic-test-quasiquoter-4 ()
   "QuasiQuote inside comment"
   (check-properties
    '("v = -- [quoter| "
      "    [inner| string {- -- |] Outside1 |] Outside2")
    '(("quoter" t font-lock-comment-face)
      ("inner" t nil)
-     ("string" t font-lock-string-face)
-     ("|" t font-lock-string-face)
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Outside1" "w" haskell-constructor-face)
      ("Outside2" "w" haskell-constructor-face)
      )))
 
-(ert-deftest haskell-syntactic-test-quasiquoter-3 ()
+(ert-deftest haskell-syntactic-test-quasiquoter-5 ()
   "QuasiQuote should not conflict with TemplateHaskell"
   (check-properties
    '("nope = [| Cons |]"
@@ -420,7 +421,27 @@ if all of its characters have syntax and face. See
      ("Cons_t" t haskell-constructor-face)
      ("Cons_d" t haskell-constructor-face)
      ("Cons_p" t haskell-constructor-face)
-     ("Cons_x" t font-lock-string-face))))
+     ("Cons_x" t haskell-quasi-quote-face))))
+
+(ert-deftest haskell-syntactic-test-quasiquoter-sql-1 ()
+  "Embedded SQL statements"
+  (check-properties
+   '("sql = [sql| SELECT title FROM books; |]")
+   '(("SELECT" t font-lock-keyword-face)
+     ("title" t nil)
+     ("FROM" t font-lock-keyword-face)
+     ("books" t nil))))
+
+(ert-deftest haskell-syntactic-test-quasiquoter-sql-2 ()
+  "Embedded SQL statements"
+  :expected-result :failed
+  ;; for now we have this problem that connstructor faces are used,
+  ;; org-mode knows how to get around this problem
+  (check-properties
+   '("sql = [sql| SELECT Title FROM Books; |]")
+   '(("Title" t nil)
+     ("Books" t nil))))
+
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
   "QuasiQuote should not conflict with TemplateHaskell"
@@ -464,3 +485,136 @@ if all of its characters have syntax and face. See
   (check-properties
    '("Q +++ 12.12")
    '(("+++" t haskell-definition-face))))
+
+(ert-deftest haskell-literate-bird-1 ()
+  (check-properties
+   '("Comment1"
+     ""
+     "> code1 = 1"
+     "> code2 = 1"
+     ""
+     "Comment2"
+     ""
+     "> code3 = 1"
+     ""
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-bird-2 ()
+  ;; Haskell Report requires empty line before bird code block. So it
+  ;; is a code block, just in error.
+  :expected-result :failed
+  (check-properties
+   '("Comment1"
+     "> code1 = 1"
+     "> code2 = 1"
+     "Comment2"
+     ""
+     "> code3 = 1"
+     ""
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     (">" t font-lock-warning-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-latex-1 ()
+  (check-properties
+   '("Comment1"
+     ""
+     "\\begin{code}"
+     "code1 = 1"
+     "code2 = 1"
+     "\\end{code}"
+     ""
+     "Comment2"
+     "\\begin{code}"
+     "code3 = 1"
+     "\\end{code}"
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-mixed-1 ()
+  :expected-result :failed
+  ;; Although Haskell Report does not advice mixing modes, it is a
+  ;; perfectly valid construct that we should support in syntax
+  ;; highlighting.
+  (check-properties
+   '("Comment1"
+     ""
+     "> code1 = 1"
+     "> code2 = 1"
+     ""
+     "Comment2"
+     "\\begin{code}"
+     "code3 = 1"
+     "\\end{code}"
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-type-instance ()
+  "Fontify \"instance\" after \"type\""
+  ;; Note that instance is always fontified, because it is a keyword even
+  ;; without 'type' before it.
+  (check-properties
+   '("type instance Foo Int = Char")
+    '(("type" "w" haskell-keyword-face)
+      ("instance" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-type-family ()
+  "Fontify \"family\" after \"type\""
+  (check-properties
+   '("type family Foo a :: *")
+    '(("type" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-data-family ()
+  "Fontify \"family\" after \"data\""
+  (check-properties
+   '("data family Foo a :: *")
+    '(("data" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-no-family ()
+  "Don't fontify \"family\" when not after \"type\" or \"data\""
+  (check-properties
+   '("foo family = 10")
+    '(("foo" "w" haskell-definition-face)
+      ("family" "w" nil))))
+
+(ert-deftest haskell-type-role ()
+  "Fontify \"role\" after \"type\""
+  (check-properties
+    '("type role Ptr representational")
+    '(("type" "w" haskell-keyword-face)
+      ("role" "w" haskell-keyword-face)
+      ("Ptr" "w" haskell-constructor-face))))
+
+(ert-deftest haskell-no-type-role ()
+  "Don't fontify \"role\" when not after \"type\""
+  (check-properties
+    '("foo role = 3")
+    '(("foo" "w" haskell-definition-face)
+      ("role" "w" nil))))

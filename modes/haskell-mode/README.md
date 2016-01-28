@@ -3,9 +3,23 @@
 
 This is an Emacs mode for editing, debugging and developing Haskell programs.
 
+[![Coverage Status](https://coveralls.io/repos/haskell/haskell-mode/badge.svg?branch=master&service=github)](https://coveralls.io/github/haskell/haskell-mode?branch=master)
 [![Build Status](https://travis-ci.org/haskell/haskell-mode.svg?branch=master)](https://travis-ci.org/haskell/haskell-mode)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
+[![Latest Docs](http://img.shields.io/badge/docs-latest-fc1e5e.svg)](http://haskell.github.io/haskell-mode/manual/latest/)
+
+
+> I just want to thank everybody involved in one way or another with the Haskell Emacs tooling.
+> It is one of the best language experiences I had in Emacs.
+> -- [cocreature, 2015-03-01](https://www.reddit.com/r/haskell/comments/2xjum3/haskellmode_february_2015_developments/cp0qa9a)
+
+> I've been using it for a long time and love it. Great work on haskell-mode! Keep up the good work!
+> -- [LukeHoersten, 2015-04-02](https://www.reddit.com/r/haskell/comments/316hcm/month_in_haskell_mode_march_2015/cpyutph)
+
+> This sounds wonderful. Does anything similar exist for Vim?
+> -- [earldouglas, 2015-07-02](https://www.reddit.com/r/haskell/comments/3bsa0f/month_in_haskell_mode_june_2015/cspdbb6)
+
 
 ## Quick Installation
 
@@ -46,14 +60,13 @@ For setup instructions, please consult the integrated `haskell-mode`
 manual which can be accessed after installation via `M-x
 info-display-manual [RET] haskell-mode`.  Alternatively, you can also
 direct your browser to the
-[the online haskell-mode manual](https://github.com/haskell/haskell-mode/wiki)
+[the online haskell-mode manual](http://haskell.github.io/haskell-mode/manual/latest/)
 for setup and user guide.
 
 
 ## Installation - more information
 
-`haskell-mode` supports GNU Emacs versions 23, 24 and upcoming 25
-(snapshot).
+`haskell-mode` supports GNU Emacs version 24 or later.
 
 `haskell-mode` is available from [melpa-stable](http://stable.melpa.org) (releases) and [melpa](http://melpa.org)
 (git snapshots).
@@ -61,18 +74,6 @@ for setup and user guide.
 Other means of obtaining `haskell-mode` include
 [el-get](https://github.com/dimitri/el-get),
 [Emacs Prelude](https://github.com/bbatsov/prelude) and [Debian package](https://packages.debian.org/search?keywords=haskell-mode).
-
-Emacs23 requires an the use of "cl-lib".  cl-lib.el can be found in
-the tests/compat directory.  Copy cl-lib.el to your emacs
-directory, e.g. ~/.emacs.d directory and put
-
-```el
-(add-to-list 'load-path "~/.emacs.d/")
-(require 'cl-lib)
-```
-
-in your .emacs file.
-
 
 ## Installation from git repository
 

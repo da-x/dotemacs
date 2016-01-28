@@ -164,8 +164,7 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   "History list for session targets.")
 
 (defun haskell-process-hayoo-ident (ident)
-  ;; FIXME Obsolete doc string, CALLBACK is not used.
-  "Hayoo for IDENT, return a list of modules asyncronously through CALLBACK."
+  "Hayoo for IDENT, return a list of modules"
   ;; We need a real/simulated closure, because otherwise these
   ;; variables will be unbound when the url-retrieve callback is
   ;; called.
@@ -309,7 +308,6 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
-  ;; FIXME insert value functionallity seems to be missing.
   "Print the type of the given expression.
 
 Given INSERT-VALUE prefix indicates that result type signature
@@ -456,7 +454,12 @@ Returns:
   "Either jump to or echo a generic location LOC.
 Either a file or a library."
   (cl-case (car loc)
-    (file (haskell-mode-jump-to-loc (cdr loc)))
+    (file (progn
+              (find-file (elt loc 1))
+              (goto-char (point-min))
+              (forward-line (1- (elt loc 2)))
+              (goto-char (+ (line-beginning-position)
+                            (1- (elt loc 3))))))
     (library (message "Defined in `%s' (%s)."
                       (elt loc 2)
                       (elt loc 1)))
@@ -636,7 +639,7 @@ happened since function invocation)."
                (min-pos (caar pos-reg))
                (max-pos (cdar pos-reg))
                (sig (haskell-utils-reduce-string response))
-               (res-type (haskell-utils-parse-repl-response sig)))
+               (res-type (haskell-utils-repl-response-error-status sig)))
 
           (cl-case res-type
             ;; neither popup presentation buffer

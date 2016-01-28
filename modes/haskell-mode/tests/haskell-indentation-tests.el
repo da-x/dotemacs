@@ -1,6 +1,7 @@
 ;;; haskell-indentation-tests.el --- tests for indentation module
 
-;; Copyright (C) 2015 Haskell Mode contributors
+;; Copyright © 2015 Haskell Mode contributors. All rights reserved.
+;;             2016 Arthur Fayzrakhmanov.
 
 ;; This file is not part of GNU Emacs.
 
@@ -19,11 +20,12 @@
 
 ;;; Commentary:
 
-;; These are tests for `haskell-indentation-mode'. It's easy to add new
+;; These are tests for `haskell-indentation-mode'.  It's easy to add new
 ;; tests, just...
 
 (require 'cl-lib)
 (require 'ert)
+(require 'haskell-test-utils)
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 (require 'haskell-indentation)
@@ -135,7 +137,7 @@ macro quotes them for you."
 function = Record
        { field = 123 }"
               (1 0)
-              (2 0 2))
+              (2 2))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -223,6 +225,18 @@ fun = [ f | x ← xs
               (4 10)
               (5 0))
 
+(hindent-test "6b \"let\" in do""
+fact n = do
+  let g = 7
+  z <- let x = 5
+       in return (x + 4)"
+              (1 0)
+              (2 2)
+              (3 2 6 8)
+              (4 7)
+              (5 2 10))
+
+
 (hindent-test "7a \"data\" after \"data\"""
 data ABC = ABC
 data DEF = DEF"
@@ -293,6 +307,12 @@ data X = X
               (1 0)
               (2 0 2)
               (3 0))
+
+(hindent-test "13b honour = on a separate line in data declaration" "
+data X a b
+  = X"
+              (1 0)
+              (2 2))
 
 (hindent-test "14* Line starting with operator inside \"do\" needs to be indented""
 fun = do
@@ -502,40 +522,36 @@ instance (Monad m) ⇒ C m a where
               (2 2)
               (3 0 2))
 
-(hindent-test "21a* fix \"let\" statement in \"do\" block""
+(hindent-test "21a fix \"let\" statement in \"do\" block""
 main :: IO ()
 main = do
 let foo = Foo {
       bar = 0
-    , baz = 0"
+      , baz = 0"
               (1 0)
-              (2 0)
+              (2 0 8)
               (3 2)
               (4 6)
-              (5 4)
-              (6 4))
+              (5 6)
+              (6 8))
 
-(hindent-test "21b* fix named fields in \"data\" declaration""
+(hindent-test "21b fix named fields in \"data\" declaration""
 data Foo = Foo {
   bar :: Int
-, baz :: Int"
+  , baz :: Int"
               (1 0)
-              (2 4)
+              (2 2)
               (3 2)
-              (4 2))
+              (4 11))
 
-(hindent-test "21c* fix \"let\" statement and record in \"do\" block""
-main :: IO ()
-main = do
-let foo = Foo {
-            bar = 0
-            , baz = 0"
+(hindent-test "21c* \"data\" declaration open on next line" "
+data Foo = Foo
+  { bar :: Int
+  , baz :: Int"
               (1 0)
-              (2 0)
+              (2 2)
               (3 2)
-              (4 14)
-              (5 12)
-              (6 12))
+              (4 4 11))
 
 (hindent-test "22 should obey layout only outside parentheses" "
 func = 1234
@@ -648,7 +664,7 @@ instance Bar Int
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 16))
+	      (2 0 2))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
@@ -665,9 +681,7 @@ data T = T {
 }
 
 "
-              ;; set of answers isn't best but it is not a bug
-              ;; should be just 0
-              (5 0 9))
+              (5 0 2))
 
 (hindent-test "35 baroque construct which causes parse error" "
 az = Projection
@@ -752,92 +766,6 @@ function = abc
        xyz"
               (3 0 7))
 
-(hindent-test "45 phrase should not eat whole stack" "
-function =
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-"
-              (84 4))
-
 (hindent-test "46 case expression with paths on their own lines" "
 fact n =
   case n of
@@ -849,6 +777,18 @@ fact n =
               (3 4)
               (4 0 2 4 6)
               (5 0 2 4 6))
+
+(hindent-test "46b case expression with guards" "
+fact n = case n of
+  n | n == 0 -> 1
+  _ | n > 0
+    , True == True -> n * fact (n - 1)"
+              (1 0)
+              (2 2)
+              ;; returns (0 2 2 6), to investigate
+              (3 0 2 6)
+              (4 4)
+              (5 0 2 6))
 
 (hindent-test "47a multiline strings" "
 fact n = \"\\
@@ -869,21 +809,93 @@ fact n = \"\\
               (2 0 9)
               (3 6))
 
+(hindent-test "48 functional dependencies" "
+class X a b | a -> b
+            , b -> a where
+  fun :: a -> b"
+              (1 0)
+              (2 12)
+              (3 2)
+              (4 0 2 9))
 
-(defmacro with-temp-switch-to-buffer (&rest body)
-  "Create a temporary buffer, use `switch-to-buffer' and evaluate BODY there like `progn'.
+(hindent-test "49 data with GADT syntax" "
+data Term a where
+  Lit :: Int -> Term Int
+  Pair :: Term a -> Term b -> Term (a,b)"
+              (1 0)
+              (2 2)
+              (3 0 2 9)
+              (4 0 2 10))
 
-Seems that `execute-kbd-macro' is not able to correctly execute keybindings without this."
-  (declare (indent 0) (debug t))
-  (let ((temp-buffer (make-symbol "temp-buffer")))
-    `(let ((,temp-buffer (generate-new-buffer " *temp*")))
-       ;; FIXME: kill-buffer can change current-buffer in some odd cases.
-       (unwind-protect
-           (progn
-             (switch-to-buffer ,temp-buffer)
-             ,@body)
-         (and (buffer-name ,temp-buffer)
-              (kill-buffer ,temp-buffer))))))
+(hindent-test "49b* data with GADT syntax and a deriving clause" "
+data G [a] b where
+  G1 :: c -> G [Int] b
+  deriving (Eq)"
+              (1 0)
+              (2 2)
+              (3 0 2))
+
+(hindent-test "50* standalone deriving" "
+data Name = Name String
+deriving instance Eq Name"
+              (1 0)
+              ;; We accept position 2 here because we have just one
+              ;; look-ahead token so we do not see 'instance'
+              ;; following 'deriving'.
+              (2 0 2))
+
+(hindent-test "51 standalone deriving" "
+data family T a
+data    instance T Int  = T1 Int | T2 Bool
+newtype instance T Char = TC Bool"
+              ;; We check that indentation does not bail on 'instance'
+              ;; here, we do not really check if it is working
+              ;; correctly. Needs better test.
+              (1 0)
+              (2 0)
+              (3 0)
+              (4 0 2))
+
+(hindent-test "52a* module simplest case two lines" "
+module A.B
+where"
+              (1 0)
+              (2 0)
+              (3 0))
+
+(hindent-test "52b module simplest case one line" "
+module A.B where"
+              (1 0)
+              (2 0))
+
+(hindent-test "52c* module with exports" "
+module A.B
+  ( x
+  , y
+  )
+where"
+              (1 0)
+              (2 2)
+              (3 2)
+              (4 2)
+              (5 0)
+              (6 0))
+
+(hindent-test "53 multiway if" "
+fun = if | guard1 -> expr1
+         | guardN -> exprN"
+              (1 0)
+              (2 9)
+              (3 0 11))
+
+(hindent-test "54 equal after guards on separate line" "
+foo x
+  | True
+  = X"
+              (1 0)
+              (2 2)
+              (3 2))
+
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
@@ -906,6 +918,9 @@ Seems that `execute-kbd-macro' is not able to correctly execute keybindings with
 
 (ert-deftest haskell-indentation-altj-comment ()
   :expected-result :failed
+  ;; Emacs 25 (snapshot) somehow passes this test, there is something
+  ;; fishy going on
+  (skip-unless (< emacs-major-version 25))
   (with-temp-switch-to-buffer
     (haskell-mode)
     (insert "main = do\n    return ()\n\n-- comment")

@@ -297,10 +297,11 @@ Returns NIL when no completions found."
          (reqstr (concat ":complete repl"
                          mlimit
                          (haskell-string-literal-encode inputstr)))
-         (rawstr (haskell-process-queue-sync-request process reqstr)))
-    ;; TODO use haskell-utils-parse-repl-response
-    (if (string-prefix-p "unknown command " rawstr)
-        (error "GHCi lacks `:complete' support (try installing 7.8 or ghci-ng)")
+         (rawstr (haskell-process-queue-sync-request process reqstr))
+         (response-status (haskell-utils-repl-response-error-status rawstr)))
+    (if (eq 'unknown-command response-status)
+        (error
+         "GHCi lacks `:complete' support (try installing GHC 7.8+ or ghci-ng)")
       (let* ((s1 (split-string rawstr "\r?\n" t))
              (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
              (h0 (car s1))) ;; "<limit count> <all count> <unused string>"
@@ -356,7 +357,7 @@ re-asking about the same imports."
   (haskell-process-set p 'evaluating v))
 
 (defun haskell-process-evaluating-p (p)
-  "Set status of evaluating to be on/off."
+  "Get status of evaluating (on/off)."
   (haskell-process-get p 'evaluating))
 
 (defun haskell-process-set-process (p v)
