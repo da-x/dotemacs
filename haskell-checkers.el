@@ -32,43 +32,36 @@
   "Run HLint as inferior of Emacs, parse error messages."
   :group 'haskell)
 
-;;;###autoload
 (defcustom haskell-lint-command "hlint"
   "The default lint command for \\[hlint]."
   :type 'string
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-scan-command "scan"
   "The default scan command for \\[haskell-scan]."
   :type 'string
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-scan-options ""
   "The default options for \\[haskell-scan]."
   :type 'string
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-lint-options ""
   "The default options for \\[hlint]."
   :type 'string
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-checkers-save-files t
   "Save modified files when run checker or not (ask user)"
   :type 'boolean
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-checkers-replace-with-suggestions nil
   "Replace user's code with suggested replacements (hlint only)"
   :type 'boolean
   :group 'haskell-checkers)
 
-;;;###autoload
 (defcustom haskell-checkers-replace-without-ask nil
   "Replace user's code with suggested replacements automatically (hlint only)"
   :type 'boolean
@@ -143,7 +136,7 @@
   (concat haskell-scan-command " " haskell-scan-options " \"" file "\""))
 
 (defun haskell-lint-make-command (file)
-  "Generates command line for scan"
+  "Generates command line for lint"
   (concat haskell-lint-command  " \"" file "\"" " " haskell-lint-options))
 
 (defmacro haskell-checkers-setup (type name)

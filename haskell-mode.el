@@ -9,7 +9,7 @@
 ;;          2001-2002 Reuben Thomas (>=v1.4)
 ;;          2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
-;; Version: 13.17-git
+;; Version: 16.1-git
 ;; URL: https://github.com/haskell/haskell-mode
 
 ;; This file is not part of GNU Emacs.
@@ -140,11 +140,12 @@
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 (require 'haskell-indentation)
+(require 'haskell-font-lock)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
-(defconst haskell-version "13.15-git"
+(defconst haskell-version "16.1-git"
   "The release version of `haskell-mode'.")
 
 ;;;###autoload
@@ -182,8 +183,8 @@ its own, nor does it contain \">\" at the start of a line -- the value
 of `haskell-literate-default' is used.")
 (make-variable-buffer-local 'haskell-literate)
 (put 'haskell-literate 'safe-local-variable 'symbolp)
+
 ;; Default literate style for ambiguous literate buffers.
-;;;###autoload
 (defcustom haskell-literate-default 'bird
   "Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
@@ -561,7 +562,6 @@ May return a qualified name."
     (delete-indentation arg)))
 
 ;; Various mode variables.
-;;;###autoload
 (defcustom haskell-mode-contextual-import-completion
   t
   "Enable import completion on haskell-mode-contextual-space."
@@ -579,7 +579,7 @@ May return a qualified name."
 (define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
 
-For more information aee also Info node `(haskell-mode)Getting Started'.
+For more information see also Info node `(haskell-mode)Getting Started'.
 
 \\<haskell-mode-map>
 
@@ -623,28 +623,25 @@ example, `M-x haskell-doc-mode'. Run it again to disable it.
 To enable a mode for every haskell-mode buffer, add a hook in
 your Emacs configuration. To do that you can customize
 `haskell-mode-hook' or add lines to your .emacs file. For
-example, to enable `haskell-indent-mode' and
-`interactive-haskell-mode', use the following:
+example, to enable `interactive-haskell-mode', use the following:
 
-    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
     (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 
 For more details see Info node `(haskell-mode)haskell-mode-hook'.
-
-Warning: do not enable more than one of the above indentation
-modes. See Info node `(haskell-mode)indentation' for more
-details.
 
 Minor modes that work well with `haskell-mode':
 
 - `smerge-mode': show and work with diff3 conflict markers used
   by git, svn and other version control systems."
   :group 'haskell
+  (when (< emacs-major-version 24)
+    (error "haskell-mode requires at least Emacs 24"))
+
   ;; paragraph-{start,separate} should treat comments as paragraphs as well.
   (set (make-local-variable 'paragraph-start)
        (concat " *{-\\| *-- |\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate)
-       (concat " *$\\| *-- |\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
+       (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
   (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
   ;; (set (make-local-variable 'adaptive-fill-function) 'haskell-adaptive-fill)
   (set (make-local-variable 'adaptive-fill-mode) nil)
@@ -809,7 +806,6 @@ Note that negative arguments do not work so well."
 (add-to-list 'completion-ignored-extensions ".hi")
 
 
-;;;###autoload
 (defcustom haskell-check-command "hlint"
   "*Command used to check a Haskell file."
   :group 'haskell
@@ -817,7 +813,6 @@ Note that negative arguments do not work so well."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
-;;;###autoload
 (defcustom haskell-tags-on-save nil
   "Generate tags via hasktags after saving."
   :group 'haskell
@@ -826,7 +821,6 @@ Note that negative arguments do not work so well."
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
-;;;###autoload
 (defcustom haskell-indent-spaces 2
   "Number of spaces to indent inwards."
   :group 'haskell)
@@ -871,15 +865,6 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
   )
-
-(defun haskell-mode-jump-to-loc (loc)
-  "Jump to the given location.
-LOC = (list FILE LINE COL)"
-  (find-file (elt loc 0))
-  (goto-char (point-min))
-  (forward-line (1- (elt loc 1)))
-  (goto-char (+ (line-beginning-position)
-                (1- (elt loc 2)))))
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/

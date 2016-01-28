@@ -38,6 +38,16 @@ order."
         (goto-char (match-end 0)))
       (should (equal nil left-lexemes)))))
 
+(ert-deftest haskell-lexeme-classify-chars-1 ()
+  (should (equal 'varsym (haskell-lexeme-classify-by-first-char ?=)))
+  (should (equal 'conid (haskell-lexeme-classify-by-first-char ?L)))
+  (should (equal 'consym (haskell-lexeme-classify-by-first-char ?:)))
+  (should (equal 'varid (haskell-lexeme-classify-by-first-char ?_)))
+  (should (equal 'varid (haskell-lexeme-classify-by-first-char ?x)))
+  (should (equal 'char (haskell-lexeme-classify-by-first-char ?')))
+  (should (equal 'string (haskell-lexeme-classify-by-first-char ?\")))
+  (should (equal 'special (haskell-lexeme-classify-by-first-char ?\;)))
+  (should (equal 'number (haskell-lexeme-classify-by-first-char ?4))))
 
 (ert-deftest haskell-lexeme-basic-tokens-1 ()
   "Get some basic self delimiting tokens right"
@@ -195,3 +205,25 @@ order."
   (check-lexemes
    '("0.12 34.22.33 1e+23 1e23 1e+33 455.33E1456.4")
    '("0.12" "34.22" "." "33" "1e+23" "1e23" "1e+33" "455.33E1456" "." "4")))
+
+(ert-deftest haskell-lexeme-quasi-quote-1 ()
+  (check-lexemes
+   '("[xml| <xml /> |]")
+   '("[xml| <xml /> |]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-2 ()
+  (check-lexemes
+   '("[xml| <xml /> |] |]")
+   '("[xml| <xml /> |]" "|" "]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-3 ()
+  :expected-result :failed
+  (check-lexemes
+   '("[xml| <xml /> |")
+   '("[xml| <xml /> |")))
+
+(ert-deftest haskell-lexeme-quasi-quote-4 ()
+  :expected-result :failed
+  (check-lexemes
+   '("[xml| <xml />")
+   '("[xml| <xml />")))
