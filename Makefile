@@ -68,7 +68,6 @@ ELFILES = \
 	haskell-mode.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
-	haskell-package.el \
 	haskell-presentation-mode.el \
 	haskell-process.el \
 	haskell-repl.el \
@@ -110,11 +109,12 @@ check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
 check: $(ELCHECKS) build-$(EMACS_VERSION)
-	$(BATCH) --eval "(when (>= emacs-major-version 24)                             \
-                           (require 'undercover)                                      \
-                           (undercover \"*.el\" (:exclude \"haskell-mode-pkg.el\")))" \
-                 -L tests                                                             \
-                 $(patsubst %,-l %,$(ELCHECKS))                                       \
+	$(BATCH) --eval "(when (>= emacs-major-version 24)					\
+                           (require 'undercover)						\
+                           (undercover \"*.el\"							\
+                              (:exclude \"haskell-mode-pkg.el\" \"haskell-compat.el\")))"	\
+                 -L tests									\
+                 $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@TAB=$$(echo "\t"); \
 	if grep -Hn "[ $${TAB}]\+\$$" *.el; then \
