@@ -304,8 +304,10 @@
 
 (defun my/markdown-mode-hook ()
   (interactive)
+
   (electric-indent-local-mode -1)
   (my/markdown-mode-set-keys)
+  (visual-line-mode)
 )
 (add-hook 'markdown-mode-hook 'my/markdown-mode-hook)
 
@@ -895,7 +897,7 @@ grep search results buffers."
 )
 
 (defun my/markdown-mode-set-keys ()
-  (inteactive)
+  (interactive)
 
   (local-set-key (kbd "M-<up>")	        'windmove-up)
   (local-set-key (kbd "M-<down>")	'windmove-down)
