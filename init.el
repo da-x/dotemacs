@@ -257,6 +257,10 @@
 (add-hook 'git-commit-mode-hook 'my/git-commit-mode-hook)
 (require 'magit)
 
+;; YASnippet
+(require 'yasnippet)
+(yas-global-mode 1)
+
 ;; Diff HL
 (require 'diff-hl)
 (global-diff-hl-mode)
@@ -542,6 +546,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (require 'goto-last-change)
 (require 'track-mode)
 (require 'wrap-region)
+(require 'lilypond-mode nil t)
 
 ;;
 
@@ -746,6 +751,9 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key		[(control p)]  'goto-last-change)
 (global-unset-key	(kbd "C--"))   ;; negative-arugment
 (global-unset-key	(kbd "C-/"))   ;; undo
+(define-key yas-minor-mode-map (kbd "<tab>") nil)
+(define-key yas-minor-mode-map (kbd "TAB") nil)
+(define-key yas-minor-mode-map (kbd "C-/") 'yas-expand)
 (global-unset-key	(kbd "C-\\"))  ;; toggle-input-mode
 (global-set-key		(kbd "C-\\")   'sp-select-next-thing-exchange)
 (global-set-key         (kbd "C-]")    'my/append-to-kill-ring)
