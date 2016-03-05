@@ -761,7 +761,8 @@ Minor modes that work well with `haskell-mode':
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t)))
+         (parse-sexp-lookup-properties . t)
+         (font-lock-extra-managed-props . (composition))))
   ;; Haskell's layout rules mean that TABs have to be handled with extra care.
   ;; The safer option is to avoid TABs.  The second best is to make sure
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
@@ -782,6 +783,11 @@ Minor modes that work well with `haskell-mode':
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
+  ;; provide non-interactive completion function
+  (add-hook 'completion-at-point-functions
+            #'haskell-completions-completion-at-point
+            nil
+            t)
   (haskell-indentation-mode))
 
 (defun haskell-fill-paragraph (justify)
