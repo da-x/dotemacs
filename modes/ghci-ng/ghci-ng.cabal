@@ -58,6 +58,7 @@ executable ghci-ng
       build-depends: Win32
   else
       build-depends: unix
+  extra-libraries:     stdc++
 
 source-repository head
   type:     git

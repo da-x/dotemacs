@@ -10,7 +10,6 @@
 (require 'haskell-font-lock)
 (require 'haskell-mode)
 (require 'haskell-process)
-(require 'haskell-simple-indent)
 (require 'haskell-interactive-mode)
 (require 'haskell-font-lock)
 
