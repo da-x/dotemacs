@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lrw
+# key: lrw
+# --
+{-# LANGUAGE RecordWildCards            #-}

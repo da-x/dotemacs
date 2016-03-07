@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ldai
+# key: ldai
+# --
+{-# LANGUAGE DoAndIfThenElse          #-}

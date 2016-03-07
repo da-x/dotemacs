@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: impq
+# key: impq
+# --
+import qualified ${1:Module} as ${2:alias}

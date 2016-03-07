@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lmptc
+# key: lmptc
+# --
+{-# LANGUAGE MultiParamTypeClasses      #-}

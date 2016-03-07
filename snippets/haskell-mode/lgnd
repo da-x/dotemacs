@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lgnd
+# key: lgnd
+# --
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}

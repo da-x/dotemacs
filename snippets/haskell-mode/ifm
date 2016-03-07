@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ifm
+# key: ifm
+# --
+if $1
+    then do return ()
+    else do return ()

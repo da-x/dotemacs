@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: llc
+# key: llc
+# --
+{-# LANGUAGE LambdaCase                 #-}

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lbp
+# key: lbp
+# --
+{-# LANGUAGE BangPatterns             #-}

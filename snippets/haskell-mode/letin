@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: letin
+# key: letin
+# binding: C-c l
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+let $0
+ in `yas-selected-text`

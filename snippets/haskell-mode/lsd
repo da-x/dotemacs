@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lsd
+# key: lsd
+# --
+{-# LANGUAGE StandaloneDeriving         #-}

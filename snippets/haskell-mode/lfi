@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lfi
+# key: lfi
+# --
+{-# LANGUAGE FlexibleInstances          #-}
