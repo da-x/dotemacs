@@ -312,8 +312,10 @@
   (electric-indent-local-mode -1)
   (my/markdown-mode-set-keys)
   (visual-line-mode)
-)
+  )
+
 (add-hook 'markdown-mode-hook 'my/markdown-mode-hook)
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 ;; Repository root
 (require 'repository-root)
