@@ -768,8 +768,9 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key   	(kbd "M-i i")  'my/replacer-with-saved-str)
 (global-unset-key	(kbd "M-k"))   ;; kill-sentence
 (global-set-key		(kbd "M-k")    'highlight-symbol-query-replace)
-(global-unset-key	(kbd "M-t"))   ;; transport-words
+(global-unset-key	(kbd "M-t"))   ;; transpose-words
 (global-set-key		(kbd "M-t")    'query-replace)
+(global-set-key		(kbd "C-S-t")  'transpose-words)
 (global-unset-key	(kbd "M-v"))   ;; scroll-down-command
 (global-set-key		(kbd "M-v")    'winner-undo)
 (global-unset-key	(kbd "M-b"))   ;; backward-word
