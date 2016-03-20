@@ -414,6 +414,20 @@ buffer instead of replacing the text in region."
   (interactive)
   (kill-buffer (current-buffer)))
 
+(defun my/copy-projectile-buffer-file-name-to-kill-ring ()
+  "Insert the curernt projectile-relative filename to the kill ring, so it
+   can be pasted somewhere else"
+  (interactive)
+
+  (let ((a (projectile-project-root))
+	(b (buffer-file-name)))
+    (if (string-prefix-p a b)
+	(progn
+	  (kill-new (substring b (length a)))
+	))
+    )
+  )
+
 (defun my/auto-spell ()
   (interactive)
   (let ((x (point)))
@@ -666,6 +680,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 
 (global-set-key (kbd "M-] s g")			'projectile-grep)
 (global-set-key (kbd "M-] s s")			'projectile-ag)
+(global-set-key (kbd "M-] s f")			'my/copy-projectile-buffer-file-name-to-kill-ring)
 
 (global-set-key (kbd "M-] 4 C-o")		'projectile-display-buffer)
 (global-set-key (kbd "M-] 4 a")			'projectile-find-other-file-other-window)
