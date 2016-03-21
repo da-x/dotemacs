@@ -83,23 +83,6 @@
    (first-overlay-in-if 'haskell-check-overlay-p
 			(buffer-end 0) (buffer-end 1))))
 
-(defun my/haskell-who-calls (&optional prompt)
-  "Grep the codebase to see who uses the symbol at point."
-  (interactive "P")
-  (let ((sym (if prompt
-                 (read-from-minibuffer "Look for: ")
-               (haskell-ident-at-point))))
-    (let ((existing (get-buffer "*who-calls*")))
-      (when existing
-        (kill-buffer existing)))
-    (let ((buffer
-           (grep-find (format "cd %s && find . -name '*.hs' -exec grep -inH -e %s {} +"
-                              (haskell-session-current-dir (haskell-session))
-                              sym))))
-      (with-current-buffer buffer
-        (rename-buffer "*who-calls*")
-        (switch-to-buffer-other-window buffer)))))
-
 (custom-set-variables
  '(haskell-process-args-cabal-repl
    '("--ghc-option=-ferror-spans" "--with-ghc=ghci-ng"))
