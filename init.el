@@ -562,6 +562,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (require 'goto-last-change)
 (require 'track-mode)
 (require 'wrap-region)
+(require 'keep-formation)
 (require 'lilypond-mode nil t)
 
 ;;
@@ -895,9 +896,9 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-c C-a")		'haskell-insert-doc)
   (define-key haskell-mode-map (kbd "C-<return>")	'haskell-simple-indent-newline-indent)
   (define-key haskell-mode-map (kbd "<space>")		'haskell-mode-contextual-space)
-  (define-key haskell-mode-map (kbd "<delete>")		'my/delete-forward-char-preserve-alignment)
-  (define-key haskell-mode-map (kbd "<backspace>")	'my/delete-backward-char-preserve-alignment)
-  (my/aligned-editing-mode)
+  (define-key haskell-mode-map (kbd "<delete>")         'keep-formation-delete-forward-char)
+  (define-key haskell-mode-map (kbd "<backspace>")      'keep-formation-delete-backward-char)
+  (keep-formation-mode)
 
   (define-key haskell-mode-map [(f4)]			'haskell-goto-next-error)
   (define-key haskell-mode-map [(shift f4)]		'haskell-goto-prev-error)
