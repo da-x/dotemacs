@@ -896,6 +896,7 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-<return>")	'haskell-simple-indent-newline-indent)
   (define-key haskell-mode-map (kbd "<space>")		'haskell-mode-contextual-space)
   (define-key haskell-mode-map (kbd "<delete>")		'my/delete-forward-char-preserve-alignment)
+  (define-key haskell-mode-map (kbd "<backspace>")	'my/delete-backward-char-preserve-alignment)
 
   (define-key haskell-mode-map [(f4)]			'haskell-goto-next-error)
   (define-key haskell-mode-map [(shift f4)]		'haskell-goto-prev-error)

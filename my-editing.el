@@ -247,10 +247,7 @@
   )
   )
 
-(defun my/delete-forward-char-preserve-alignment ()
-  (interactive)
-  "Delete but don't damage whitespace alignemnt"
-
+(defun my/preserve-for-delete-alignment (offset)
   (let (eol nls orig)
     (progn
       (setq orig (point))
@@ -260,16 +257,31 @@
       (if (not (eq eol nil))
 	  (save-excursion (setq nls (search-forward "  " eol t))))
 
-      (if (and eol nls (not (eq (+ orig 2) nls)))
+      (if (and eol nls (not (eq (+ orig offset) nls)))
 	  (save-excursion
 	    (goto-char nls)
 	    (insert " ")
 	    )
 	)
       ))
+  )
 
+(defun my/delete-forward-char-preserve-alignment ()
+  (interactive)
+  "Delete but don't damage whitespace alignemnt"
+
+  (my/preserve-for-delete-alignment 2)
   (delete-char 1)
-)
+  )
+
+(defun my/delete-backward-char-preserve-alignment ()
+  (interactive)
+  "Delete but don't damage whitespace alignemnt"
+
+  (if (eq overwrite-mode nil)
+      (my/preserve-for-delete-alignment 1))
+  (delete-backward-char 1)
+  )
 
 (defun my/join-lines ()
   (interactive "")
