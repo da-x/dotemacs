@@ -270,7 +270,8 @@
   (interactive)
   "Delete but don't damage whitespace alignemnt"
 
-  (my/preserve-for-delete-alignment 2)
+  (when my/aligned-editing-mode
+    (my/preserve-for-delete-alignment 2))
   (delete-char 1)
   )
 
@@ -278,10 +279,45 @@
   (interactive)
   "Delete but don't damage whitespace alignemnt"
 
-  (if (eq overwrite-mode nil)
-      (my/preserve-for-delete-alignment 1))
+  (when my/aligned-editing-mode
+    (if (eq overwrite-mode nil)
+	(my/preserve-for-delete-alignment 1)))
   (delete-backward-char 1)
   )
+
+(defun my/post-self-insert-hook-handler-preserve-alignment ()
+  (interactive)
+
+  (if (eq overwrite-mode nil)
+      (let (eol nls orig)
+	(progn
+	  (setq orig (point))
+
+	  (save-excursion (setq eol (search-forward "\n" nil t)))
+
+	  (if (not (eq eol nil))
+	      (save-excursion (setq nls (search-forward "  " eol t))))
+
+	  (if (and eol nls)
+	      (save-excursion
+		(goto-char (- nls 1))
+		(delete-char 1)
+		)
+	    )
+	  ))
+    )
+  )
+
+;;;###autoload
+(define-minor-mode my/aligned-editing-mode
+  "Aligned editing mode"
+  :lighter " Ae"
+  (if my/aligned-editing-mode
+      (progn
+	(add-hook 'post-self-insert-hook 'my/post-self-insert-hook-handler-preserve-alignment t))
+      (progn
+	(remove-hook 'post-self-insert-hook 'my/post-self-insert-hook-handler-preserve-alignment t))
+      ))
 
 (defun my/join-lines ()
   (interactive "")
