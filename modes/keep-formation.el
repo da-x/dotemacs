@@ -8,9 +8,13 @@
 ;;;
 ;;; Here's an example, enabling it for haskell-mode:
 ;;;
+;;; (defun my/haskell-mode-enable-keep-formation ()
 ;;;    (define-key haskell-mode-map (kbd "<delete>")    'keep-formation-delete-forward-char)
 ;;;    (define-key haskell-mode-map (kbd "<backspace>") 'keep-formation-delete-backward-char)
 ;;;    (keep-formation-mode)
+;;; )
+;;;
+;;; (add-hook 'haskell-mode-hook 'my/haskell-mode-enable-keep-formation)
 ;;;
 ;;; Code:
 ;;;
@@ -43,7 +47,7 @@
       (progn
 	(add-hook 'post-self-insert-hook 'keep-formation-post-self-insert-hook t))
       (progn
-	(remove-hook 'post-self-insert-hook 'keep-formation-post-self-insert-hook t))
+	(remove-hook 'post-self-insert-hook 'keep-formation-post-self-insert-hook))
       ))
 
 (defun keep-formation-delete-forward-char ()
