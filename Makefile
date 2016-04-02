@@ -37,48 +37,9 @@ EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'ap
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
-ELFILES = \
-	ghc-core.el \
-	ghci-script-mode.el \
-	highlight-uses-mode.el \
-	haskell-align-imports.el \
-	haskell-cabal.el \
-	haskell-checkers.el \
-	haskell-collapse.el \
-	haskell-modules.el \
-	haskell-sandbox.el \
-	haskell-commands.el \
-	haskell-compat.el \
-	haskell-compile.el \
-	haskell-complete-module.el \
-	haskell-completions.el \
-	haskell-customize.el \
-	haskell-debug.el \
-	haskell-decl-scan.el \
-	haskell-doc.el \
-	haskell.el \
-	haskell-font-lock.el \
-	haskell-hoogle.el \
-	haskell-indentation.el \
-	haskell-indent.el \
-	haskell-interactive-mode.el \
-	haskell-lexeme.el \
-	haskell-load.el \
-	haskell-menu.el \
-	haskell-mode.el \
-	haskell-move-nested.el \
-	haskell-navigate-imports.el \
-	haskell-presentation-mode.el \
-	haskell-process.el \
-	haskell-repl.el \
-	haskell-session.el \
-	haskell-sort-imports.el \
-	haskell-string.el \
-	haskell-unicode-input-method.el \
-	haskell-utils.el \
-	inf-haskell.el
+ELFILES := $(filter-out haskell-mode-autoloads.el haskell-mode-pkg.el,$(wildcard *.el))
 
-ELCHECKS := $(shell echo tests/*-tests.el)
+ELCHECKS := $(wildcard tests/*-tests.el)
 
 AUTOLOADS = haskell-mode-autoloads.el
 
@@ -109,7 +70,7 @@ check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
 check: $(ELCHECKS) build-$(EMACS_VERSION)
-	$(BATCH) --eval "(when (>= emacs-major-version 24)					\
+	$(BATCH) --eval "(when (= emacs-major-version 24)					\
                            (require 'undercover)						\
                            (undercover \"*.el\"							\
                               (:exclude \"haskell-mode-pkg.el\" \"haskell-compat.el\")))"	\
@@ -117,8 +78,12 @@ check: $(ELCHECKS) build-$(EMACS_VERSION)
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@TAB=$$(echo "\t"); \
-	if grep -Hn "[ $${TAB}]\+\$$" *.el; then \
-	    echo "Some files contain whitespace at the end of lines, correct it"; \
+	if grep -Hn "[ $${TAB}]\+\$$" *.el tests/*.el; then \
+	    echo "Error: Files contain whitespace at the end of lines" >&2; \
+	    exit 3; \
+	fi; \
+	if grep -Hn "[$${TAB}]" *.el tests/*.el; then \
+	    echo "Error: Tab character is not allowed" >&2; \
 	    exit 3; \
 	fi
 	@echo "checks passed!"
@@ -172,3 +137,5 @@ $(AUTOLOADS): $(ELFILES)
 		--eval '(setq make-backup-files nil)' \
 		--eval '(setq generated-autoload-file "$(CURDIR)/$@")' \
 		-f batch-update-autoloads "."
+	# check if autoloads will really load
+	$(BATCH) -l "$@"

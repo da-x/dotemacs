@@ -203,7 +203,7 @@ fun = [ x | y,
               (2 12)
               (3 0 6))
 
-(hindent-test "6* \"let\" in list comprehension""
+(hindent-test "6a* \"let\" in list comprehension""
 fun = [ f | x <- xs
           , y <- ys
           , let c = 123
@@ -213,6 +213,25 @@ fun = [ f | x <- xs
               (3 10)
               (4 10)
               (5 0 6))
+
+(hindent-test "6b* \"let\" in list comprehension""
+fun = [ f | x <- [1]
+          , y <- [2]
+          , let c, d :: Int
+                c = 123
+                d = 45
+          , f <- [x * y * c * d] ]"
+              ;; this one is interesting because the comma betweed c
+              ;; and d does not count as a comma for list
+              ;; comprehension elements
+              (1 0)
+              (2 10)
+              (3 10)
+              (4 16)
+              (5 16)
+              (6 10)
+              (7 0 6))
+
 
 (hindent-test "6u* \"let\" in list comprehension""
 fun = [ f | x ← xs
@@ -656,28 +675,45 @@ test = [randomQQ| This is
 "
               (4 0 2))
 
+(hindent-test "29c quasiquote with quotes in it and a string outside" "
+foo = do
+  let bar = [text|\"some text\"|]
+  button \"Cancel\" $ do
+"
+              (4 4))
+
+(hindent-test "29d unfinished quasiquote" "
+foo = [text|some
+"
+              (2 0 11))
+
+(hindent-test "29e an expression quotation" "
+foo = [|forever $ do
+"
+              (2 10))
+
 (hindent-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
-	      (1 2))
+              (1 2))
 
 (hindent-test "31* allow type class declaration without methods" "
 class Foo a where
 instance Bar Int
 "
-	      (2 0))
+              (2 0))
 
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 16))
+              (2 0 16))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
 foo = ()
 #else
 "
-	      (4 0))
+              (4 0))
 
 
 (hindent-test "34 beginning of line inside parentheses" "
@@ -697,7 +733,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent-test "35a parse a backslash properly" "
 az = Projection
@@ -707,7 +743,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent-test "36 yet another parser failure" "
 tokOpenTag =
@@ -715,11 +751,11 @@ tokOpenTag =
        , return
        ]
 "
-	      (4 7))
+              (4 7))
 (hindent-test "37* Indent continuation lines in multiline string literal" "
 a = \"multiline\\
 "
-	      (2 4))
+              (2 4))
 
 (hindent-test "38 Indent in do block after multiline string literal" "
 s = do
@@ -735,20 +771,20 @@ servePost = do
   b <- queryT \"comma is important: , \\
              \\ line 2 \"
 "
-	      (6 0 2 4))
+              (6 0 2 4))
 
 (hindent-test "40 parse error in multiline tuple" "
 a = ( 1
 , "
-	      (2 4)
-	      (3 2))
+              (2 4)
+              (3 2))
 
 (hindent-test "41 open do inside a list" "
 x = asum [ withX $ do
              return ()
          ]
 "
-	      (2 13))
+              (2 13))
 
 (hindent-test "42 open do inside a list second element" "
 x = asum [ mzero
@@ -756,7 +792,7 @@ x = asum [ mzero
              return ()
          ]
 "
-	      (3 13))
+              (3 13))
 
 (hindent-test "43 open do inside a list second element, reset alignment" "
 x = asum [ mzero
@@ -764,7 +800,7 @@ x = asum [ mzero
                  return ()
          ]
 "
-	      (3 17))
+              (3 17))
 
 (hindent-test "44 expression continues, reset alignment" "
 function = abc

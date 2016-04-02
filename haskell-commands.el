@@ -35,6 +35,7 @@
 (require 'haskell-presentation-mode)
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
+(require 'haskell-cabal)
 
 ;;;###autoload
 (defun haskell-process-restart ()
@@ -527,8 +528,8 @@ of which the latter defaults to the current buffer."
   (or (haskell-session-get session 'current-dir)
       (haskell-session-get session 'cabal-dir)
       (if (buffer-file-name buffer)
-	  (file-name-directory (buffer-file-name buffer))
-	  "~/")))
+          (file-name-directory (buffer-file-name buffer))
+          "~/")))
 
 (defun haskell-session-prompt-set-current-dir (session &optional use-default)
   "Prompt for the current directory.
@@ -537,8 +538,8 @@ Return current working directory for SESSION."
     (haskell-session-set-current-dir
      session
      (if use-default
-	 default
-	 (haskell-utils-read-directory-name "Set current directory: " default))))
+         default
+         (haskell-utils-read-directory-name "Set current directory: " default))))
   (haskell-session-get session 'current-dir))
 
 (defun haskell-process-change-dir (session process dir)
@@ -689,7 +690,9 @@ happened since function invocation)."
 
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
-;;;###autoload
+(make-obsolete 'haskell-process-generate-tags
+               'haskell-mode-generate-tags
+               "2016-03-14")
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table.
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
@@ -700,20 +703,13 @@ function `xref-find-definitions' after new table was generated."
      process
      (make-haskell-command
       :state (cons process and-then-find-this-tag)
-      :go (lambda (state)
-            (if (eq system-type 'windows-nt)
-                (haskell-process-send-string
-                 (car state)
-                 (format ":!hasktags --output=\"%s\\TAGS\" -x -e \"%s\""
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))))
-              (haskell-process-send-string
-               (car state)
-               (format ":!cd %s && %s | %s"
-                       (haskell-session-cabal-dir
-                        (haskell-process-session (car state)))
-                       "find . -type d \\( -path ./.stack-work -o -path ./dist -o -path ./.cabal-sandbox \\) -prune -o -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
-                       "xargs -0 hasktags -e -x"))))
+      :go
+      (lambda (state)
+        (let* ((process (car state))
+               (cabal-dir (haskell-session-cabal-dir
+                           (haskell-process-session process)))
+               (command (haskell-cabal--compose-hasktags-command cabal-dir)))
+          (haskell-process-send-string process command)))
       :complete (lambda (state _response)
                   (when (cdr state)
                     (let ((tags-file-name
@@ -813,8 +809,8 @@ output.  If CMD fails the buffer remains unchanged."
                     (setq str (replace-match "" t t str)))
                   str))
          (_errout (lambda (fmt &rest args)
-		    (let* ((warning-fill-prefix "    "))
-		      (display-warning cmd (apply 'format fmt args) :warning))))
+                    (let* ((warning-fill-prefix "    "))
+                      (display-warning cmd (apply 'format fmt args) :warning))))
          (filename (buffer-file-name (current-buffer)))
          (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
          (tmp-file (make-temp-file cmd-prefix))
@@ -824,8 +820,8 @@ output.  If CMD fails the buffer remains unchanged."
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
          (_errcode (with-temp-file tmp-file
-		     (call-process cmd filename
-				   (list (current-buffer) err-file) nil)))
+                     (call-process cmd filename
+                                   (list (current-buffer) err-file) nil)))
          (stderr-output
           (with-temp-buffer
             (insert-file-contents err-file)
