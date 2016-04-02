@@ -29,7 +29,7 @@
             (and (consp key) (> (car key) 128))
             (and (numberp key) (> key 128)))
            (if (member val '(Pc Pd Po Sm Sc Sk So))
-	       (modify-category-entry key ?P))))
+               (modify-category-entry key ?P))))
    unicode-category-table)
 
   (dolist (key (string-to-list "!#$%&*+./<=>?@^|~\\-"))
@@ -271,7 +271,9 @@ See `haskell-lexeme-classify-by-first-char' for details."
           (let ((match-data (match-data)))
             (if (and (equal "[" (match-string-no-properties 0))
                      (looking-at haskell-lexeme-quasi-quote-literal))
-                (if (member (match-string-no-properties 1) '("e" "d" "p" "t"))
+                (if (or (member (match-string-no-properties 1) '("e" "d" "p" "t"))
+                        (not (equal (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                                    'varid)))
                     (progn
                       (set-match-data match-data)
                       'special)

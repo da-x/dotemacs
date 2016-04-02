@@ -215,9 +215,9 @@ setting up the inferior-haskell buffer."
 
 (defun inferior-haskell-send-decl-post-filter (string)
   (when (and inferior-haskell-send-decl-post-filter-on
-             #1=(string-match inferior-haskell-multiline-prompt-re string))
+             (string-match inferior-haskell-multiline-prompt-re string))
     ;; deleting sequence of `%s|' multiline promts
-    (while #1#
+    (while (string-match inferior-haskell-multiline-prompt-re string)
       (setq string (substring string (match-end 0))))
     ;; deleting regular prompts
     (setq string (replace-regexp-in-string comint-prompt-regexp "" string)
@@ -272,7 +272,7 @@ The process PROC should be associated to a comint buffer."
            )
       (or (when cabal
             (with-current-buffer cabal
-              (let ((hsd (haskell-cabal-get-setting "hs-source-dirs")))
+              (let ((hsd (haskell-cabal--get-field "hs-source-dirs")))
                 (if (null hsd)
                     ;; If there's a Cabal file with no Hs-Source-Dirs, then
                     ;; just use the Cabal file's directory.

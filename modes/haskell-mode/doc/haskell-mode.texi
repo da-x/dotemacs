@@ -61,6 +61,7 @@ interpreter (e.g. GHCi).
 * Interactive Haskell::             How to interact with GHCi (2)
 * Editing Cabal files::             Cabal support
 * Changing REPL target::            Start REPL with selected target (i.e. test,bench,etc.)
+* Using with flyspell-prog-mode::   Spell check comments and strings
 * Concept index::                   Index of Haskell Mode concepts
 * Function index::                  index of commands
 * Variable index::                  Index of options and types
@@ -116,12 +117,13 @@ gmane.comp.lang.haskell.emacs} newsgroup.
 If you have discovered a bug or wish to request a new feature, you can
 @uref{https://github.com/haskell/haskell-mode/issues/new, file a new
 issue} with Haskell Mode's issue tracker. When filing a bug, please
-state your currently used software version (@kbd{M-x haskell-version},
-@kbd{M-x version}) and what steps to perform in order to reproduce the
-bug you're experiencing. Finally, if you happen to be proficient in
-@ref{Top,Emacs Lisp,,elisp} you are welcome to submit patches via
-@uref{https://help.github.com/articles/using-pull-requests, GitHub Pull
-Requests}.
+state your currently used software version (@kbd{M-x}
+@code{haskell-version}, @kbd{M-x} @code{version}) and what steps to
+perform in order to reproduce the bug you're experiencing. Finally, if
+you happen to be proficient in @ref{Top,Emacs Lisp,,elisp} you are
+welcome to submit patches via
+@uref{https://help.github.com/articles/using-pull-requests, GitHub
+Pull Requests}.
 
 @node Getting Started
 @chapter Getting Started
@@ -145,29 +147,30 @@ Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/h
 
 Then run Emacs, and evaluate:
 
-    @code{M-x package-refresh-contents}
+    @kbd{M-x} @code{package-refresh-contents}
 
 and then follow by
 
-    @code{M-x package-install RET haskell-mode}
+    @kbd{M-x} @code{package-install} @kbd{RET} @code{haskell-mode}
 
-Voila! @code{haskell-mode} is installed! You should be able to edit Haskell
-source code in color now.
+Voila! @code{haskell-mode} is installed! You should be able to edit
+Haskell source code in color now.
 
 @section Installation - more information
 
 @code{haskell-mode} supports GNU Emacs versions 24 and upcoming 25
 (snapshot).
 
-@code{haskell-mode} is available from @uref{http://stable.melpa.org,melpa-stable (releases)} and @uref{http://melpa.org, melpa
-(git snapshots)}.
+@code{haskell-mode} is available from
+@uref{http://stable.melpa.org,melpa-stable (releases)} and
+@uref{http://melpa.org, melpa (git snapshots)}.
 
 Other means of obtaining @code{haskell-mode} include
 @uref{https://github.com/dimitri/el-get, el-get},
 @uref{https://github.com/bbatsov/prelude, Emacs Prelude} and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
-Last version of @code{haskell-mode} that supported Emacs 23 is @code{haskell-mode}
-13.18 available at
+Last version of @code{haskell-mode} that supported Emacs 23 is
+@code{haskell-mode} 13.18 available at
 @uref{https://github.com/haskell/haskell-mode/releases/tag/v13.18}.
 
 @section Customizing
@@ -199,17 +202,17 @@ customize-variable @key{RET} haskell-mode-hook}.
 @dfn{Haskell Mode} is actually a collection of so-called major
 modes@footnote{for more information about the concept of @dfn{major
 modes} @pxref{Major Modes,,,emacs}} one of which is called
-@code{haskell-mode}.  To avoid confusion, when referring to this package
-the name ``Haskell mode'' is written in a normal font, whereas when
-referring the major mode of the same name @code{haskell-mode} written
-with a dash in-between in a typewriter font is used.
+@code{haskell-mode}.  To avoid confusion, when referring to this
+package the name ``Haskell mode'' is written in a normal font, whereas
+when referring the major mode of the same name @code{haskell-mode}
+written with a dash in-between in a typewriter font is used.
 
 As one might guess, @code{haskell-mode} is the (programming
-language@footnote{@code{haskell-mode} is derived from @code{prog-mode}})
-major mode for editing (non-literate) Haskell source
-code. @code{haskell-mode} is associated with the file extensions listed
-below by default@footnote{for more information about file associations,
-@pxref{Choosing Modes,,,emacs}}.
+language@footnote{@code{haskell-mode} is derived from
+@code{prog-mode}}) major mode for editing (non-literate) Haskell
+source code. @code{haskell-mode} is associated with the file
+extensions listed below by default@footnote{for more information about
+file associations, @pxref{Choosing Modes,,,emacs}}.
 
 @table @file
 @item .hs
@@ -266,7 +269,7 @@ There are a few functions for managing imports.
 
 To jump to your import list, run
 
-    @code{M-x haskell-navigate-imports}
+    @kbd{M-x} @code{haskell-navigate-imports}
 
 It's nicer to have a keybinding to do this, for example:
 
@@ -281,7 +284,7 @@ cycle.
 
 To generally format (sort, align) your imports, you can run
 
-    @code{M-x haskell-mode-format-imports}
+    @kbd{M-x} @code{haskell-mode-format-imports}
 
 Or @kbd{C-c C-.}.
 
@@ -289,53 +292,81 @@ Or @kbd{C-c C-.}.
 
 To just sort imports, jump to an import section and run
 
-    @code{M-x haskell-sort-imports}
+    @kbd{M-x} @code{haskell-sort-imports}
 
 @subsection Align imports
 
 To just align imports, jump to an import section and run
 
-    @code{M-x haskell-align-imports}
-
-@subsection Entering imports
-
-If you have Haskell Interactive Mode enabled and a session open,
-you can write
-
-    @code{import}
-
-And then hit @kbd{SPC} (running @code{M-x haskell-mode-contextual-space})
-which will prompt a list of all modules, either installed modules or
-local project directory files. Then it'll insert it and then format that
-module section.
+    @kbd{M-x} @code{haskell-align-imports}
 
 @subsection stylish-haskell
 
 As an alternative to the elisp functions described above, haskell-mode
-can use the program @url{
-http://hackage.haskell.org/package/stylish-haskell, stylish-haskell}
-to format imports.  You can set this behavior by typing: @kbd{M-x
-customize-variable @key{RET} haskell-stylish-on-save}.  You can
-install @code{stylish-haskell} by running @code{stack install
+can use the program
+@url{http://hackage.haskell.org/package/stylish-haskell,
+stylish-haskell} to format imports.  You can set this behavior by
+typing: @kbd{M-x} @code{customize-variable} @kbd{RET}
+@code{haskell-stylish-on-save}.  You can install
+@code{stylish-haskell} by running @code{stack install
 stylish-haskell}, or if you have not installed @code{stack},
 @code{cabal install stylish-haskell}.
 
+@section Haskell Tags
+
+@code{haskell-mode} can generate tags when saving source files.  To
+generate tags @code{haskell-mode} uses external program —
+@url{https://github.com/MarcWeber/hasktags, Hasktags}
+(@url{https://wiki.haskell.org/Tags, wiki-article}).  To turn on tags
+generatation customize or set to @code{t} @code{haskell-tags-on-save}
+variable.  Also, you may find useful to revert tags tables
+automatically, this can be done by customizing
+@code{tags-revert-without-query} variable (either globally or for
+Haskell buffers only).
+
 @section Completion support
 
-@code{haskell-mode} can complete symbols, pragma directives and language
-extensions. This is part of @code{haskell-interactive-mode}.
+@code{haskell-mode} can complete symbols, pragma directives, language
+extensions, and language keywords out-of-box.  @code{haskell-mode}
+completes identifiers (symbols) using tags (see ``Tags''), however you
+can get more precise completions with @code{haskell-interactive-mode}.
+In interactive mode completion candidates are produced by querying
+GHCi REPL.
 
 @ifhtml
 @image{anim/company-mode-language-pragma}
 @end ifhtml
 
-If haskell-interactive-mode is enabled and working haskell mode provides
-completions for import statements taking into account currently loaded
-and available packages.
+If @code{haskell-interactive-mode} is enabled and working Haskell mode
+provides completions for import statements taking into account
+currently loaded and available packages.  Also it completes symbols
+querying REPL with @code{:complete} command, hence completion
+candidate list also includes symbols from imported modules.
 
 @ifhtml
 @image{anim/company-mode-import-statement}
 @end ifhtml
+
+Unfortunatelly, it is not possible to provide candidates for
+identifiers defined locally in @code{let} and @code{where} blocks even
+in interactive mode.  But if you're using
+@url{http://company-mode.github.io/, company-mode} you can override
+@code{company-backends} variable for Haskell buffers to combine
+completion candidates from completion-at-point function
+(@code{company-capf} backend) and dynamic abbrevs.
+@code{company-mode} provides special backend for dabbrev code
+completions, namely @code{company-dabbrev-code}.  To combine
+completions from diffrent backends you can create grouped backends, it
+is very easy — a grouped backend is just a list of backends, for
+example:
+
+@lisp
+(add-hook 'haskell-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 (append '((company-capf company-dabbrev-code))
+                         company-backends))))
+@end lisp
 
 @section Profiling and Debugging support
 
@@ -776,7 +807,7 @@ program to start and its arguments:
 If it's @code{ghci}, @code{haskell-process-path-ghci} and
 @code{haskell-process-args-ghci} will be used.
 @item
-If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and 
+If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and
 @code{haskell-process-args-ghci}.
 @item
 If it's @code{stack-ghci}, @code{haskell-process-path-stack} and
@@ -845,6 +876,41 @@ Answer ``yes'' to restart the session and run your tests, benchmarks, executable
 
 
 TODO/WRITEME
+
+@node Using with flyspell-prog-mode
+@chapter Using with @code{flyspell-prog-mode}
+
+Strings and comments can be checked for spelling mistakes. There is a
+standard Emacs mode for this purpose, @code{flyspell-prog-mode}, that
+can be enabled in Haskell buffers. Spelling errors are underlined using
+squiggly red lines.
+
+@ifhtml
+@image{anim/flyspell-prog-mode}
+@end ifhtml
+
+Documentation for @code{flyspell-prog-mode} can be found in
+@xref{Spelling,,,emacs}. Here we point to a couple of useful
+keybindings:
+
+@itemize
+@item
+@kbd{M-$} - Check and correct spelling of the word at point (@code{ispell-word}).
+
+@item
+@kbd{digit} - Replace the word, just this time, with one of the
+displayed near-misses. Each near-miss is listed with a digit; type that
+digit to select it.
+
+@item
+@kbd{SPC} - Skip this word—continue to consider it incorrect, but don’t
+change it here.
+@end itemize
+
+To enable spell checking of strings and comments add this line to your
+@code{~/.emacs} file:
+
+@code{(add-hook 'haskell-mode-hook 'flyspell-prog-mode)}
 
 @node Concept index
 @unnumbered Concept index
