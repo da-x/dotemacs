@@ -247,6 +247,12 @@
   )
   )
 
+(defun my/delete-region ()
+  (interactive)
+  ;; Only let S-delete kill the region if it is visible!
+  (if (use-region-p)
+      (kill-region (region-beginning) (region-end))))
+
 (defun my/join-lines ()
   (interactive "")
 

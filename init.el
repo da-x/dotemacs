@@ -801,6 +801,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-unset-key	(kbd "M-SPC")) ;; just-one-space
 (global-set-key         (kbd "M-SPC")  'my/dired-list-git-ls-files-current-dir)
 
+(global-set-key		(kbd "S-<delete>") 'my/delete-region)
+
 (define-key helm-find-files-map [return]	'my/helm-find-files-navigate-forward)
 (define-key helm-find-files-map [backspace]	'my/helm-find-files-navigate-back)
 (define-key helm-find-files-map [(control ?d)] (lambda () (interactive) (helm-select-nth-action 1)))
