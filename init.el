@@ -114,6 +114,7 @@
 
 (recentf-mode 1)
 (setq recentf-max-menu-items 1000)
+(setq max-lisp-eval-depth 6000)
 
 (setq auto-save-list-file-prefix nil)
 (setq make-backup-files nil)
