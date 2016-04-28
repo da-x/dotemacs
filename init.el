@@ -310,6 +310,7 @@
 (defun my/markdown-mode-hook ()
   (interactive)
 
+  (setq indent-tabs-mode nil)
   (electric-indent-local-mode -1)
   (my/markdown-mode-set-keys)
   (visual-line-mode)
