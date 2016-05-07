@@ -36,6 +36,11 @@
      ("_f" "w" haskell-symbol-face)
      ("_'''" "w" haskell-symbol-face))))
 
+(ert-deftest haskell-syntactic-test-character-literal-escapes ()
+  (check-properties
+   '("'\\000' '\\x01'")
+   '(("'\\000'" t font-lock-string-face)
+     ("'\\x01'" t font-lock-string-face))))
 
 (ert-deftest haskell-syntactic-test-7 ()
   "Take quotes and double quotes under control."
@@ -220,7 +225,7 @@
      " --  ^ Com7"
      " --  * Com8"
      " {-| Dcom10 -}"                   ; haddocks
-     " {-$ dcom11 -}"
+     " {-$ Dcom11 -}"
      " {-^ Dcom12 -}"
      " {-* Dcom13 -}"
      " {- | Dcom14 -}"                  ; also haddocks
@@ -268,6 +273,7 @@
      " 9.9'r'"                          ; (9.9,'r')
      " 's'12e-34"                       ; ('s',1.2e-33)
      " 't'56.78"                        ; ('t',56.78)
+     " ."
      )
    '(("'a'" t font-lock-string-face)
      ("'b'" t font-lock-string-face)
@@ -294,6 +300,7 @@
      ("12e-34" t nil)
      ("'t'" t font-lock-string-face)
      ("56.78" t nil)
+     ("." t haskell-operator-face)
      )))
 
 
@@ -371,19 +378,18 @@
   (check-properties
    '("sql = [sql| SELECT title FROM books; |]")
    '(("SELECT" t font-lock-keyword-face)
-     ("title" t nil)
+     ("title" t default)
      ("FROM" t font-lock-keyword-face)
-     ("books" t nil))))
+     ("books" t default))))
 
 (ert-deftest haskell-syntactic-test-quasiquoter-sql-2 ()
   "Embedded SQL statements"
-  :expected-result :failed
   ;; for now we have this problem that connstructor faces are used,
   ;; org-mode knows how to get around this problem
   (check-properties
    '("sql = [sql| SELECT Title FROM Books; |]")
-   '(("Title" t nil)
-     ("Books" t nil))))
+   '(("Title" t default)
+     ("Books" t default))))
 
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
@@ -552,7 +558,7 @@
     '("type role Ptr representational")
     '(("type" "w" haskell-keyword-face)
       ("role" "w" haskell-keyword-face)
-      ("Ptr" "w" haskell-constructor-face))))
+      ("Ptr" "w" haskell-type-face))))
 
 (ert-deftest haskell-no-type-role ()
   "Don't fontify \"role\" when not after \"type\""
@@ -581,3 +587,274 @@
     '(("\"" "\"" font-lock-warning-face)
       ("zonk" t font-lock-string-face)
       ("\\" t font-lock-warning-face))))
+
+(ert-deftest haskell-type-colors-01 ()
+  (check-properties
+   "x :: Int -> String"
+   '(("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-02 ()
+  (check-properties
+   '("x :: (Monad m,"
+     "      Applicative m)"
+     "  => m Int")
+   '(("Monad" t haskell-type-face)
+     ("Applicative" t haskell-type-face)
+     ("Int" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-03 ()
+  (check-properties
+   '("x :: Lens' S A"
+     "y Nothing1 Nothing2 = Nothing3")
+   '(("Lens" t haskell-type-face)
+     ("S" t haskell-type-face)
+     ("A" t haskell-type-face)
+     ("Nothing1" t haskell-constructor-face)
+     ("Nothing2" t haskell-constructor-face)
+     ("Nothing3" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-04 ()
+  (check-properties
+   '("x :: Lens' S A"
+     "(++++) Nothing1 Nothing2 = Nothing3")
+   '(("Lens" t haskell-type-face)
+     ("S" t haskell-type-face)
+     ("A" t haskell-type-face)
+     ("Nothing1" t haskell-constructor-face)
+     ("Nothing2" t haskell-constructor-face)
+     ("Nothing3" t haskell-constructor-face))))
+
+
+(ert-deftest haskell-type-colors-05 ()
+  (check-properties
+   '"class (Monad a, Applicative b) => m a Int | a -> b String where"
+   '(("Monad" t haskell-type-face)
+     ("Applicative" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-06 ()
+  (check-properties
+   '"instance (Monad a, Applicative b) => m a Int | a -> b String where"
+   '(("Monad" t haskell-type-face)
+     ("Applicative" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-07 ()
+  :expected-result :failed
+  (check-properties
+   '"data X = X1 String | X2 Int"
+   '(("X" t haskell-type-face)
+     ("X1" t haskell-constructor-face)
+     ("String" t haskell-type-face)
+     ("X2" t haskell-constructor-face)
+     ("Int" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-08 ()
+  ;; simplified version of 07
+  (check-properties
+   '"data X = X1 String | X2 Int"
+   '(("X" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-09 ()
+  (check-properties
+   '"type X a b = Monad a (Lens b)"
+   '(("X" t haskell-type-face)
+     ("Monad" t haskell-type-face)
+     ("Lens" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-10 ()
+  (check-properties
+   '"type family X a b = Monad a (Lens b)"
+   '(("X" t haskell-type-face)
+     ("Monad" t haskell-type-face)
+     ("Lens" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-11 ()
+  (check-properties
+   '("data X a where"
+     "    X1 :: Int1 -> X Int2"
+     "    X2 :: String1 -> X String2")
+   '(("X" t haskell-type-face)
+     ("X1" t haskell-constructor-face)
+     ("Int1" t haskell-type-face)
+     ("X" t haskell-type-face)
+     ("Int2" t haskell-type-face)
+     ("X2" t haskell-constructor-face)
+     ("String1" t haskell-type-face)
+     ("X" t haskell-type-face)
+     ("String2" t haskell-type-face))))
+
+
+(ert-deftest haskell-type-colors-12 ()
+  :expected-result :failed
+  (check-properties
+   '"data X = Int1 :+: String2 | String3 :-: Int4"
+   '(("X" t haskell-type-face)
+     ("Int1" t haskell-type-face)
+     (":+:" t haskell-constructor-face)
+     ("String2" t haskell-type-face)
+     ("String3" t haskell-type-face)
+     (":-:" t haskell-constructor-face)
+     ("Int4" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-13 ()
+  (check-properties
+   '"newtype Xa = Xb Int"
+   '(("Xa" t haskell-type-face)
+     ("Xb" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-14 ()
+  :expected-result :failed
+  (check-properties
+   '"newtype Xa = Xb Int"
+   '(("Xa" t haskell-type-face)
+     ("Xb" t haskell-constructor-face)
+     ("Int" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-15 ()
+  (check-properties
+   '"newtype Xa = Xb { xbField :: Int }"
+   '(("Xa" t haskell-type-face)
+     ("Xb" t haskell-constructor-face)
+     ("Int" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-16 ()
+  :expected-result :failed
+  (check-properties
+   '"module M ( a, X(..), Y, Z(A,B)) where"
+   '(("M" t haskell-constructor-face)
+     ("X" t haskell-type-face)
+     ("Y" t haskell-type-face)
+     ("Z" t haskell-type-face)
+     ("A" t haskell-constructor-face)
+     ("B" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-17 ()
+  (check-properties
+   '"[Just 5 :: Maybe Int | X <- xs]"
+   '(("Just" t haskell-constructor-face)
+     ("Maybe" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("X" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-18 ()
+  (check-properties
+   '"[Just 5 :: Maybe Int]"
+   '(("Just" t haskell-constructor-face)
+     ("Maybe" t haskell-type-face)
+     ("Int" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-19 ()
+  (check-properties
+   '"(5 :: Int, Just 5 :: Maybe Int) X"
+   '(("Int" t haskell-type-face)
+     ("Just" t haskell-constructor-face)
+     ("Maybe" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("X" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-20 ()
+  (check-properties
+   '"x { x = 5 :: Int} Nothing"
+   '(("Int" t haskell-type-face)
+     ("Nothing" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-21 ()
+  (check-properties
+   '("x = do"
+     "  y :: Maybe Int <- return Nothing")
+   '(("Maybe" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("Nothing" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-22 ()
+  (check-properties
+   '("x = case y :: Int of"
+     "  42 -> Nothing")
+   '(("Int" t haskell-type-face)
+     ("Nothing" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-23 ()
+  (check-properties
+   '("x :: Int ->"
+     "     String")
+   '(("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-24 ()
+  (check-properties
+   '("x :: Int ->"
+     ""
+     " -- comment"
+     "  {-"
+     " multiline"
+     " -}"
+     ""
+     "     String")
+   '(("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-25 ()
+  (check-properties
+   '("x :: Int"
+     ""
+     " -- comment"
+     "  {-"
+     " multiline"
+     " -}"
+     ""
+     "     -> String")
+   '(("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-26 ()
+  (check-properties
+   '("x :: Int"
+     ""
+     " -- comment"
+     "  {-"
+     " multiline"
+     " -}"
+     ""
+     "X `abc` Z")
+   '(("Int" t haskell-type-face)
+     ("X" t haskell-constructor-face)
+     ("Z" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-27 ()
+  (check-properties
+   '("x"
+     "    ::"
+     "   Int"
+     "  ->"
+     "  String")
+   '(("Int" t haskell-type-face)
+     ("String" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-28 ()
+  (check-properties
+   "type instance Typ Int  b = Show b"
+   '(("Typ" t haskell-type-face)
+     ("Int" t haskell-type-face)
+     ("Show" t haskell-type-face))))
+
+(ert-deftest haskell-type-colors-29 ()
+  :expected-result :failed
+  (check-properties
+   "import qualified X as Y(a,Z(C))"
+   '(("X" t haskell-constructor-face)
+     ("Y" t haskell-constructor-face)
+     ("Z" t haskell-type-face)
+     ("C" t haskell-constructor-face))))
+
+(ert-deftest haskell-type-colors-30 ()
+  :expected-result :failed
+  (check-properties
+   "import qualified X as Y hiding(a,Z(C))"
+   '(("X" t haskell-constructor-face)
+     ("Y" t haskell-constructor-face)
+     ("Z" t haskell-type-face)
+     ("C" t haskell-constructor-face))))

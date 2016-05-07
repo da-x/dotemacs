@@ -107,13 +107,16 @@ Note that (match-string 1) returns the unqualified part.")
 Note that negative sign char is not part of a number.")
 
 (defconst haskell-lexeme-char-literal-inside
-  (rx (| (regexp "[^\n'\\]")
+  (rx (| (not (any "\n'\\"))
          (: "\\"
             (| "a" "b" "f" "n" "r" "t" "v" "\\" "\"" "'"
                "NUL" "SOH" "STX" "ETX" "EOT" "ENQ" "ACK"
                "BEL" "BS" "HT" "LF" "VT" "FF" "CR" "SO" "SI" "DLE"
                "DC1" "DC2" "DC3" "DC4" "NAK" "SYN" "ETB" "CAN"
                "EM" "SUB" "ESC" "FS" "GS" "RS" "US" "SP" "DEL"
+               (regexp "[0-9]+")
+               (: "x" (regexp "[0-9a-fA-F]+"))
+               (: "o" (regexp "[0-7]+"))
                (: "^" (regexp "[]A-Z@^_\\[]"))))))
   "Regexp matching an inside of a character literal.")
 
@@ -216,7 +219,7 @@ of a token."
      ((member char '(?\] ?\[ ?\( ?\) ?\{ ?\} ?\` ?\, ?\;))
       'special))))
 
-(defun haskell-lexeme-looking-at-token ()
+(defun haskell-lexeme-looking-at-token (&rest flags)
   "Like `looking-at' but understands Haskell lexemes.
 
 Moves point forward over whitespace.  Returns a symbol describing
@@ -247,8 +250,9 @@ See `haskell-lexeme-classify-by-first-char' for details."
       ;; newlines have syntax set to generic string delimeter. We want
       ;; those to be treated as whitespace anyway
       (or
-       (> (skip-syntax-forward "->") 0)
-       (> (skip-chars-forward "\n") 0)))
+       (> (skip-syntax-forward "-") 0)
+       (and (not (member 'newline flags))
+            (> (skip-chars-forward "\n") 0))))
   (let
       ((case-fold-search nil)
        (point (point-marker)))
@@ -258,6 +262,8 @@ See `haskell-lexeme-classify-by-first-char' for details."
       (progn
         (set-match-data (list point (set-marker (make-marker) (line-end-position))))
         'literate-comment))
+     (and (looking-at "\n")
+          'newline)
      (and (looking-at "{-")
           (save-excursion
             (forward-comment 1)
