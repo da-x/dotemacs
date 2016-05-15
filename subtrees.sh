@@ -82,7 +82,7 @@ remove() {
     git rm -fr ${1}
 }
 
-${cmd} modes/company-mode https://github.com/company-mode/company-mode 0.8.11
+${cmd} modes/company-mode https://github.com/company-mode/company-mode master
 ${cmd} modes/dash https://github.com/magnars/dash.el.git master
 ${cmd} modes/diff-hl https://github.com/dgutov/diff-hl.git master
 ${cmd} modes/dmode https://github.com/Emacs-D-Mode-Maintainers/Emacs-D-Mode.git master
