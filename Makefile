@@ -1,4 +1,5 @@
 all:
+	make -C modes/company-mode
 	make -C modes/haskell-mode
 	make -C modes/helm
 	make -C modes/magit
