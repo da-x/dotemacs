@@ -83,7 +83,9 @@
       (should (null company-candidates))
       (insert "a")
       (sleep-for 0.1)
-      (should (null company-candidates)))))
+      (should (null company-candidates))
+      (should (null company-candidates-cache))
+      (should (null company-backend)))))
 
 (ert-deftest company-idle-begin-async-allows-immediate-callbacks ()
   (with-temp-buffer
@@ -159,3 +161,59 @@
                      (company-call-backend 'candidates "foo")))
       (let ((company-backend (list immediate)))
         (should (equal '("f") (company-call-backend 'candidates "foo")))))))
+
+(ert-deftest company-multi-backend-merges-deferred-candidates-2 ()
+  (with-temp-buffer
+    (let ((company-backend (list (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb) (funcall cb '("a" "b")))))))
+                                 (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb) (funcall cb '("c" "d")))))))
+                                 (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb) (funcall cb '("e" "f"))))))))))
+      (should (equal :async (car (company-call-backend-raw 'candidates "foo"))))
+      (should (equal '("a" "b" "c" "d" "e" "f")
+                     (company-call-backend 'candidates "foo"))))))
+
+(ert-deftest company-multi-backend-merges-deferred-candidates-3 ()
+  (with-temp-buffer
+    (let ((company-backend (list (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb) (funcall cb '("a" "b")))))))
+                                 (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb)
+                                              (run-with-timer
+                                               0.01 nil
+                                               (lambda ()
+                                                 (funcall cb '("c" "d")))))))))
+                                 (lambda (command &optional _)
+                                   (pcase command
+                                     (`prefix "foo")
+                                     (`candidates
+                                      (cons :async
+                                            (lambda (cb)
+                                              (run-with-timer
+                                               0.01 nil
+                                               (lambda ()
+                                                 (funcall cb '("e" "f"))))))))))))
+      (should (equal :async (car (company-call-backend-raw 'candidates "foo"))))
+      (should (equal '("a" "b" "c" "d" "e" "f")
+                     (company-call-backend 'candidates "foo"))))))
