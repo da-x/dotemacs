@@ -100,6 +100,13 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#000000" :foreground "#ffffff" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 95 :width normal :foundry "xos4" :family "Terminus"))))
  '(col-highlight ((t (:background "#444466"))) t)
+ '(company-scrollbar-bg ((t (:background "#9999ff"))))
+ '(company-scrollbar-fg ((t (:background "white"))))
+ '(company-template-field ((t (:background "blue" :foreground "black"))))
+ '(company-tooltip ((t (:background "#2222cc" :foreground "#cccccc"))))
+ '(company-tooltip-annotation ((t (:background "black" :foreground "#ccccff"))))
+ '(company-tooltip-common ((t (:foreground "#ffffff"))))
+ '(company-tooltip-selection ((t (:background "#6688cc" :foreground "black"))))
  '(diff-hl-insert ((t (:background "#77bb77" :foreground "#33bb33"))))
  '(egoge-display-time ((t (:foreground "#ccffff"))) t)
  '(flycheck-error-face ((t (:background "#990000"))) t)

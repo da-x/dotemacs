@@ -6,6 +6,7 @@
 ;;;
 
 (require 'haskell)
+(require 'company)
 (require 'intero)
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
@@ -153,23 +154,6 @@
 )
 (add-hook 'haskell-cabal-mode-hook 'my/haskell-cabal-mode-hook)
 
-;;
-;; This will enable stack-ide in the future. Currently it's broken for me -
-;; project-local imports fail in flycheck.
-;;
-;; (require 'flycheck)
-;; (add-to-list 'load-path "/home/dan/dev/gh/commercialhaskell/stack-ide/stack-mode/")
-
-(defun my/enable-stack-mode ()
-  (interactive)
-  (flycheck-mode t)
-  (intero-mode)
-  (stack-mode t)
-  )
-
-
-;; (require 'stack-mode)
-;; (add-hook 'haskell-mode-hook 'my/enable-stack-mode)
 
 (defun my/haskell-splice-with-dollar ()
   "Turn (...) to $ ..."
@@ -183,6 +167,9 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
 (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
+(add-hook 'haskell-mode-hook 'intero-mode)
+(add-hook 'haskell-mode-hook 'company-mode)
+
 
 (provide 'my-haskell)
 ;;; my-haskell.el ends here

@@ -886,10 +886,12 @@ grep search results buffers."
   (define-key interactive-haskell-mode-map (kbd "C-c C-k")	'haskell-interactive-mode-clear)
   (define-key interactive-haskell-mode-map (kbd "C-c C-c")	'haskell-process-cabal-build)
   (define-key interactive-haskell-mode-map (kbd "C-c c")	'haskell-process-cabal)
-  (define-key interactive-haskell-mode-map (kbd "M-.")		'haskell-mode-goto-loc)
   (define-key interactive-haskell-mode-map (kbd "C-c C-?")	'haskell-mode-find-uses)
-  (define-key interactive-haskell-mode-map (kbd "C-c C-t")	'haskell-mode-show-type-at)
-  (define-key interactive-haskell-mode-map (kbd "C-c t")	'haskell-mode-show-type-at)
+  (define-key interactive-haskell-mode-map (kbd "M-.")		'intero-goto-definition)
+  (define-key interactive-haskell-mode-map (kbd "C-=")		'intero-goto-definition)
+  (define-key interactive-haskell-mode-map (kbd "C-c C-t")	'intero-type-at)
+  (define-key interactive-haskell-mode-map (kbd "C-c t")	'intero-type-at)
+  (define-key interactive-haskell-mode-map (kbd "M-'")		'company-intero)
   )
 
 (defun my/haskell-mode-keys ()
@@ -914,7 +916,6 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-x C-g w")	'isearch-forward-word)
   (define-key haskell-mode-map (kbd "C-c C-d")		'inferior-haskell-load-file)
   (define-key haskell-mode-map [(ctrl c) f5]		'haskell-mode-stylish-buffer)
-  ;; (define-key haskell-mode-map (kbd "C-c C-c")  'my/run-ghc-compilation)
   )
 
 (defun my/haskell-cabal-mode-keys ()
