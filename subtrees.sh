@@ -86,6 +86,7 @@ ${cmd} modes/company-mode https://github.com/company-mode/company-mode master
 ${cmd} modes/dash https://github.com/magnars/dash.el.git master
 ${cmd} modes/diff-hl https://github.com/dgutov/diff-hl.git master
 ${cmd} modes/dmode https://github.com/Emacs-D-Mode-Maintainers/Emacs-D-Mode.git master
+${cmd} modes/intero https://github.com/commercialhaskell/intero 0.1.13
 ${cmd} modes/flycheck https://github.com/flycheck/flycheck.git 0.24
 ${cmd} modes/flycheck-rust https://github.com/flycheck/flycheck-rust master
 ${cmd} modes/ghci-ng https://github.com/chrisdone/ghci-ng.git master
