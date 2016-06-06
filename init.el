@@ -905,9 +905,6 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "<backspace>")      'keep-formation-delete-backward-char)
   (keep-formation-mode)
 
-  (define-key haskell-mode-map [(f4)]			'haskell-goto-next-error)
-  (define-key haskell-mode-map [(shift f4)]		'haskell-goto-prev-error)
-  (define-key haskell-mode-map [(ctrl f4)]		'my/haskell-goto-first-error)
   (define-key haskell-mode-map (kbd "C-x <up>")		'haskell-navigate-imports)
   (define-key haskell-mode-map (kbd "C-x <down>")	'haskell-navigate-imports-return)
   (define-key haskell-mode-map (kbd "C-,")        (lambda () (interactive) (haskell-move-nested-left 2)))
@@ -917,7 +914,7 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-x C-g w")	'isearch-forward-word)
   (define-key haskell-mode-map (kbd "C-c C-d")		'inferior-haskell-load-file)
   (define-key haskell-mode-map [(ctrl c) f5]		'haskell-mode-stylish-buffer)
-;; (define-key haskell-mode-map (kbd "C-c C-c")    'my/run-ghc-compilation)
+  ;; (define-key haskell-mode-map (kbd "C-c C-c")  'my/run-ghc-compilation)
   )
 
 (defun my/haskell-cabal-mode-keys ()

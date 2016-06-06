@@ -6,6 +6,7 @@
 ;;;
 
 (require 'haskell)
+(require 'intero)
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
 (require 'haskell-mode)
@@ -162,10 +163,10 @@
 (defun my/enable-stack-mode ()
   (interactive)
   (flycheck-mode t)
-  (flycheck-disable-checker 'haskell-ghc)
-  (flycheck-disable-checker 'haskell-stack-ghc)
-  (flycheck-clear t)
-  (stack-mode t))
+  (intero-mode)
+  (stack-mode t)
+  )
+
 
 ;; (require 'stack-mode)
 ;; (add-hook 'haskell-mode-hook 'my/enable-stack-mode)
