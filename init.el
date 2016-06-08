@@ -49,6 +49,9 @@
 (global-auto-revert-mode)
 (setq global-auto-revert-non-file-buffers t)
 
+;; Auto-save
+(setq buffer-save-without-query t)
+
 ;; Show-paren
 (setq show-paren-delay 0)
 (show-paren-mode)
@@ -253,6 +256,11 @@
 (defun my/magit-log-branches ()
   (interactive)
   (magit-log-branches (quote ("--graph" "--decorate" "--color")))
+)
+
+(defun my/magit-log-current-branch ()
+  (interactive)
+  (magit-log-head (quote ("--decorate" "--color")))
 )
 
 (add-hook 'git-commit-mode-hook 'my/git-commit-mode-hook)
@@ -729,10 +737,15 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 ;; 'git status'
 (global-unset-key	[(control n)]) ;; next-line
 (global-set-key		[(control n)]  'magit-status)
+;; c c: new commit from staged
 
 ;; 'git log HEAD --branches'
-(global-unset-key	[(control q)]) ;; quoted-insert
-(global-set-key		[(control q)]  'my/magit-log-branches)
+(global-unset-key       [(control c) (q)]) ;; quoted-insert
+(global-set-key         [(control c) (q)] 'my/magit-log-branches)
+;;
+(global-unset-key       [(control q)]) ;; quoted-insert
+(global-set-key         [(control q)]  'my/magit-log-current-branch)
+
 ;; [return]: To look at commits
 ;; P Q: push
 ;; r e: rebase interactive from here
