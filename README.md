@@ -1,67 +1,32 @@
-# <img src="https://github.com/commercialhaskell/intero/raw/master/images/intero.svg" height=25> intero [![Build Status](https://travis-ci.org/commercialhaskell/intero.png)](https://travis-ci.org/commercialhaskell/intero)
+# <img src="https://github.com/commercialhaskell/intero/raw/master/images/intero.svg" height=25> intero [![Build Status](https://travis-ci.org/commercialhaskell/intero.png)](https://travis-ci.org/commercialhaskell/intero) <a href="https://melpa.org/#/intero"><img alt="MELPA" src="https://melpa.org/packages/intero-badge.svg"/></a>
 
 Complete interactive development program for Haskell
 
-## Supported GHC versions
+## Intero for Emacs
 
-Intero been built and tested on the following GHC versions:
+Please see
+[the homepage for Intero for Emacs](http://commercialhaskell.github.io/intero).
 
-* GHC 8.0.1
-* GHC 7.10.3
-* GHC 7.10.2
-* GHC 7.8.4
+#### Default key bindings
 
-## Features
+Key binding | Description
+--- | ---
+`M-.` | Jump to definition
+`C-c C-i` | Show information of identifier at point
+`C-c C-t` | Show the type of thing at point, or the selection
+`C-c C-l` | Load this module in the REPL
 
-It's basically GHCi plus extra features. Those are:
+## Intero for IDE writers
 
-* [Find uses of an identifier in a module.](https://github.com/commercialhaskell/intero/blob/28609611c9f7c7d63370ce66e8ebb97676a8374e/src/test/Main.hs#L118)
-* [Find definition of an identifier in a module.](https://github.com/commercialhaskell/intero/blob/28609611c9f7c7d63370ce66e8ebb97676a8374e/src/test/Main.hs#L143)
-* [Show the type of an expression or identifier](https://github.com/commercialhaskell/intero/blob/28609611c9f7c7d63370ce66e8ebb97676a8374e/src/test/Main.hs#L82).
-* [List all types of all expressions of all modules loaded.](https://github.com/commercialhaskell/intero/blob/28609611c9f7c7d63370ce66e8ebb97676a8374e/src/test/Main.hs#L98)
-* [Completion of identifiers within a module's scope.](https://github.com/commercialhaskell/intero/blob/bbd71951edb89f06a939910024f85cc44c11c16e/src/test/Main.hs#L242)
+Please see
+[the TOOLING.md file for how to use Intero to integrate your own editor.](https://github.com/commercialhaskell/intero/blob/master/TOOLING.md).
 
-Probably more to come.
+## Issues
 
-## Requirements
+Issues are split into low/medium/high priorities which dictates which
+ones will be implemented first.
 
-The following dependencies are necessary:
-
-* The `tinfo` and `ncurses` library.
-
-  * Ubuntu and Debian users can install it using the following
-    command:
-
-          $ apt-get install libtinfo-dev
-          $ apt-get install libncurses5-dev
-
-## Installing
-
-Use `stack build` (not `install`) for each of your package sets. Each
-LTS or nightly should have a separate `stack build`. **If you use**
-`stack install` **you will run into incompatibility issues
-between package sets.**
-
-Standard:
-
-    $ stack build intero
-
-From source:
-
-    $ git clone https://github.com/commercialhaskell/intero.git
-    $ cd intero
-    $ stack build intero
-
-## Running
-
-To run it plainly use:
-
-    $ stack exec intero
-
-You'll have to run `stack build intero` within each separate LTS
-version you use, this ensures that the intero you launch correctly
-matches the GHC version that you're working with.
-
-To load up your stack project use:
-
-    $ stack ghci --with-ghc intero
+* [High priority issues](https://github.com/commercialhaskell/intero/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22priority%3A+high%22+)
+* [Medium priority issues](https://github.com/commercialhaskell/intero/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22priority%3A+medium%22)
+* [Low priority issues](https://github.com/commercialhaskell/intero/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22priority%3A+low%22)
+* [Unprioritized issues](https://github.com/commercialhaskell/intero/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+-label%3A%22priority%3A+low%22++-label%3A%22priority%3A+medium%22++-label%3A%22priority%3A+high%22+)
