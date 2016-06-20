@@ -742,7 +742,8 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 ;; 'git log HEAD --branches'
 (global-unset-key       [(control c) (q)]) ;; quoted-insert
 (global-set-key         [(control c) (q)] 'my/magit-log-branches)
-;;
+
+;; 'git log HEAD'
 (global-unset-key       [(control q)]) ;; quoted-insert
 (global-set-key         [(control q)]  'my/magit-log-current-branch)
 
