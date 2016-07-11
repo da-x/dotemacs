@@ -106,4 +106,5 @@ ${cmd} modes/smartparens https://github.com/Fuco1/smartparens.git master
 ${cmd} modes/smooth-scrolling https://github.com/aspiers/smooth-scrolling.git master
 ${cmd} modes/wrap-region https://github.com/rejeep/wrap-region.el.git master
 ${cmd} modes/go-mode https://github.com/dominikh/go-mode.el.git master
+${cmd} modes/js2-mode https://github.com/mooz/js2-mode 20160623
 
