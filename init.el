@@ -788,6 +788,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "C-/") 'yas-expand)
+(define-key yas-minor-mode-map (kbd "C-h /") 'yas-describe-tables)
 (global-unset-key	(kbd "C-\\"))  ;; toggle-input-mode
 (global-set-key		(kbd "C-\\")   'sp-select-next-thing-exchange)
 (global-set-key         (kbd "C-]")    'my/append-to-kill-ring)

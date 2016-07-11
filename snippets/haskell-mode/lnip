@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lnip
+# key: lnip
+# --
+{-# LANGUAGE NoImplicitPrelude        #-}

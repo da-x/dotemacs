@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gnws
+# key: gnws
+# --
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
