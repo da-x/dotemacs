@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ldg
+# key: ldg
+# --
+{-# LANGUAGE DeriveGeneric              #-}
