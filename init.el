@@ -500,6 +500,13 @@ buffer instead of replacing the text in region."
                   (get-char-property (point) 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
+(defun my/plog-mode ()
+  (interactive)
+  (visual-line-mode)
+  (setq buffer-face-mode-face '(:family "Palatino Linotype" :height 250 :width semi-condensed))
+  (buffer-face-mode)
+  )
+
 (defun my/ignore-error-wrapper (fn)
   "Funtion return new function that ignore errors.
    The function wraps a function with `ignore-errors' macro."
@@ -639,6 +646,9 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key (kbd "C-s-2")			'(lambda () (interactive) (workspace-goto ?2)))
 (global-set-key (kbd "C-s-3")			'(lambda () (interactive) (workspace-goto ?3)))
 (global-set-key (kbd "C-s-4")			'(lambda () (interactive) (workspace-goto ?4)))
+
+(global-set-key (kbd "C-+")			'text-scale-increase)
+(global-set-key (kbd "C--")			'text-scale-decrease)
 
 (global-set-key (kbd "C-c <deletechar>")	'my/join-lines)
 
@@ -811,6 +821,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-unset-key	(kbd "C-\\"))  ;; toggle-input-mode
 (global-set-key		(kbd "C-\\")   'sp-select-next-thing-exchange)
 (global-set-key         (kbd "C-]")    'my/append-to-kill-ring)
+(global-set-key         (kbd "M-[")    'yas-expand)
 (global-unset-key	(kbd "C-@"))   ;; set-mark-command
 (global-unset-key	(kbd "C-_"))   ;; undo
 (global-unset-key	(kbd "M-i"))   ;; tab-to-tab-stop
