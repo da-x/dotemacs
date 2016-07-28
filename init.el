@@ -648,7 +648,6 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-set-key (kbd "C-s-4")			'(lambda () (interactive) (workspace-goto ?4)))
 
 (global-set-key (kbd "C-+")			'text-scale-increase)
-(global-set-key (kbd "C--")			'text-scale-decrease)
 
 (global-set-key (kbd "C-c <deletechar>")	'my/join-lines)
 
@@ -813,6 +812,7 @@ If `F.~REV~' already exists, use it instead of checking it out again."
 (global-unset-key	[(control p)]) ;; previous-line
 (global-set-key		[(control p)]  'goto-last-change)
 (global-unset-key	(kbd "C--"))   ;; negative-arugment
+(global-set-key         (kbd "C--")	'text-scale-decrease)
 (global-unset-key	(kbd "C-/"))   ;; undo
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
