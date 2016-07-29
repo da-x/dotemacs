@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lstv
+# key: lstv
+# --
+{-# LANGUAGE ScopedTypeVariables #-}

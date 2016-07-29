@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: catch
+# key: catch
+# expand-env: ((yas-indent-line 'fixed))
+# --
+${1:name} <-
+  let ok    = $0
+      err e = ${3:undefined}
+  in catchAny ok err
