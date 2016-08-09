@@ -502,6 +502,7 @@ buffer instead of replacing the text in region."
 
 (defun my/plog-mode ()
   (interactive)
+  (markdown-mode)
   (visual-line-mode)
   (setq buffer-face-mode-face '(:family "Palatino Linotype" :height 250 :width semi-condensed))
   (buffer-face-mode)
