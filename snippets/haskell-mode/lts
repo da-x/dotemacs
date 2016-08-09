@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lts
+# key: lts
+# --
+{-# LANGUAGE TupleSections       #-}
