@@ -8,6 +8,7 @@
 (require 'haskell)
 (require 'company)
 (require 'intero)
+(require 'hasky-extensions)
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
 (require 'haskell-mode)

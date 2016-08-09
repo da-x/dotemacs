@@ -108,3 +108,4 @@ ${cmd} modes/wrap-region https://github.com/rejeep/wrap-region.el.git master
 ${cmd} modes/go-mode https://github.com/dominikh/go-mode.el.git master
 ${cmd} modes/js2-mode https://github.com/mooz/js2-mode 20160623
 ${cmd} modes/hasky-extensions https://github.com/hasky-mode/hasky-extensions 0.1.0
+${cmd} modes/avy-menu https://github.com/mrkkrp/avy-menu 0.1.0
