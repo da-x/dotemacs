@@ -1,2 +1,5 @@
-# Ignore the private deployment key
-/deploy
+# Sphinx build artifacts
+/_build/
+
+# Python bytecode of the in-tree Sphinx extensions
+__pycache__/
