@@ -961,6 +961,7 @@ grep search results buffers."
   (define-key haskell-mode-map (kbd "C-x C-g _")	'isearch-forward-symbol)
   (define-key haskell-mode-map (kbd "C-x C-g w")	'isearch-forward-word)
   (define-key haskell-mode-map (kbd "C-c C-d")		'inferior-haskell-load-file)
+  (define-key haskell-mode-map [(ctrl c) f4]		'hasky-extensions)
   (define-key haskell-mode-map [(ctrl c) f5]		'haskell-mode-stylish-buffer)
   )
 
