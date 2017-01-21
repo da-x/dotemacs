@@ -88,7 +88,6 @@ ${cmd} modes/diff-hl https://github.com/dgutov/diff-hl.git master
 ${cmd} modes/dmode https://github.com/Emacs-D-Mode-Maintainers/Emacs-D-Mode.git master
 ${cmd} modes/intero https://github.com/commercialhaskell/intero master
 ${cmd} modes/flycheck https://github.com/flycheck/flycheck.git 30
-${cmd} modes/flycheck-rust https://github.com/flycheck/flycheck-rust master
 ${cmd} modes/ghci-ng https://github.com/chrisdone/ghci-ng.git master
 ${cmd} modes/gitmodes https://github.com/magit/git-modes.git master
 ${cmd} modes/grep-a-lot https://github.com/ZungBang/emacs-grep-a-lot.git master
@@ -100,7 +99,7 @@ ${cmd} modes/helm-proc https://github.com/markus1189/helm-proc.git master
 ${cmd} modes/hindent https://github.com/chrisdone/hindent.git master
 ${cmd} modes/magit https://github.com/magit/magit.git 2.2.2
 ${cmd} modes/perspective https://github.com/nex3/perspective-el.git 1.12
-${cmd} modes/projectile https://github.com/bbatsov/projectile.git v0.12.0
+${cmd} modes/projectile https://github.com/bbatsov/projectile.git v0.14.0
 ${cmd} modes/rust https://github.com/rust-lang/rust-mode master
 ${cmd} modes/smartparens https://github.com/Fuco1/smartparens.git master
 ${cmd} modes/smooth-scrolling https://github.com/aspiers/smooth-scrolling.git master

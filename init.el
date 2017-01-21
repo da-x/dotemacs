@@ -304,8 +304,6 @@
 
 ;; Rust
 (require 'rust-mode)
-(require 'flycheck-rust)
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
 ;; Go
 (require 'go-mode)
