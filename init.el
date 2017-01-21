@@ -304,6 +304,7 @@
 
 ;; Rust
 (require 'rust-mode)
+(add-hook 'rust-mode-hook (lambda () (flycheck-select-checker 'rust-cargo)))
 
 ;; Go
 (require 'go-mode)
