@@ -201,6 +201,7 @@ ghciCommands = [
   ("back",      keepGoing backCmd,              noCompletion),
   ("browse",    keepGoing' (browseCmd False),   completeModule),
   ("browse!",   keepGoing' (browseCmd True),    completeModule),
+  ("extensions", keepGoing' extensionsCmd,   completeModule),
   ("cd",        keepGoing' changeDirectory,     completeFilename),
   ("cd-ghc",    keepGoing' changeDirectoryGHC,  completeFilename),
   ("check",     keepGoing' checkModule,         completeHomeModule),
@@ -317,6 +318,7 @@ defFullHelpText =
   "   :add [*]<module> ...        add module(s) to the current target set\n" ++
   "   :browse[!] [[*]<mod>]       display the names defined by module <mod>\n" ++
   "                               (!: more details; *: all top-level names)\n" ++
+  "   :extensions <mod>           display the extensions enabled by module <mod>\n" ++
   "   :cd <dir>                   change directory to <dir>\n" ++
   "   :cmd <expr>                 run the commands returned by <expr>::IO String\n" ++
   "   :complete <dom> [<rng>] <s> list completions for partial input string\n" ++
@@ -1981,6 +1983,35 @@ isSafeModule m = do
               part pkg = trusted $ getPackageDetails dflags pkg
 #endif
 
+--------------------------------------------------------------------------------
+-- :extensions
+
+extensionsCmd :: String -> InputT GHCi ()
+extensionsCmd string = do
+  modules <- mapM lookupModule moduleStrings
+  dynflags <-
+    mapM (fmap GHC.ms_hspp_opts . GHC.getModSummary . GHC.moduleName) modules
+  let someExtensions = concatMap dynFlagsEnabledExtensions dynflags
+  liftIO (putStrLn (unwords (nub someExtensions)))
+  where
+    moduleStrings = words string
+
+-- | Get enabled extensions from the dynamic flags.
+dynFlagsEnabledExtensions :: DynFlags -> [String]
+dynFlagsEnabledExtensions df =
+  [ name
+  | name <- supportedLanguagesAndExtensions
+  , extension <- [toEnum 0 ..]
+  , downcase name == downcase (showExtension extension)
+  , xopt extension df
+  ]
+  where
+    downcase = map toLower
+    showExtension e =
+      if isPrefixOf "Opt_" (show e)
+        then drop (length "Opt_") (show e)
+        else show e
+
 -----------------------------------------------------------------------------
 -- :browse
 
@@ -2271,7 +2302,9 @@ setGHCContextFromGHCiState = do
         then iidecls ++ [implicitPreludeImport]
         else iidecls
     -- XXX put prel at the end, so that guessCurrentModule doesn't pick it up.
-
+  -- Get the names in scope
+  names <- GHC.getRdrNamesInScope
+  modifyGHCiState (\s -> s { rdrNamesInScope = names })
 
 -- -----------------------------------------------------------------------------
 -- Utils on InteractiveImport
@@ -2580,6 +2613,7 @@ unsetOptions str
            ]
 
          no_flag ('-':'f':rest) = return ("-fno-" ++ rest)
+         no_flag ('-':'X':rest) = return ("-XNo" ++ rest)
          no_flag f = throwGhcException (ProgramError ("don't know how to reverse " ++ f))
 
      in if (not (null rest3))
