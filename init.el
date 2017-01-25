@@ -303,8 +303,24 @@
 (require 'buffer-move)
 
 ;; Rust
+(require 'company)
 (require 'rust-mode)
-(add-hook 'rust-mode-hook (lambda () (flycheck-select-checker 'rust-cargo)))
+(require 'racer)
+
+(defun my/rust-mode-hook ()
+  (flycheck-select-checker 'rust-cargo)
+  (company-mode)
+;;  (racer-mode)
+  )
+
+(defun my/racer-mode-hook ()
+  (eldoc-mode)
+  (company-mode)
+  )
+
+(add-hook 'rust-mode-hook 'my/rust-mode-hook)
+(add-hook 'racer-mode-hook 'my/racer-mode-hook)
+;; (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 
 ;; Go
 (require 'go-mode)

@@ -4,6 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-revert-interval 5)
+ '(company-tooltip-align-annotations t)
  '(doc-view-resolution 200)
  '(flycheck-checkers
    (quote
@@ -29,7 +30,9 @@
  '(haskell-interactive-mode-include-file-name nil)
  '(haskell-notify-p t)
  '(haskell-process-args-cabal-repl (quote ("--ghc-option=-ferror-spans" "--with-ghc=ghci-ng")))
- '(haskell-process-args-ghci (quote ("-ferror-spans")))
+ '(haskell-process-args-ghci
+   (quote
+    ("ghci" "--with-ghc" "intero" "--no-load" "--no-build")))
  '(haskell-process-args-stack-ghci
    (quote
     ("--ghc-options=\"-ferror-spans\"" "--with-ghc=ghci-ng")))
@@ -37,14 +40,13 @@
  '(haskell-process-generate-tags nil)
  '(haskell-process-log t)
  '(haskell-process-path-ghci "stack")
- '(haskell-process-use-ghci t)
- '(haskell-process-args-ghci '("ghci" "--with-ghc" "intero" "--no-load" "--no-build"))
  '(haskell-process-reload-with-fbytecode nil)
  '(haskell-process-suggest-haskell-docs-imports nil)
  '(haskell-process-suggest-hayoo-imports nil)
  '(haskell-process-suggest-hoogle-imports t)
  '(haskell-process-suggest-remove-import-lines t)
- '(haskell-process-type 'ghci)
+ '(haskell-process-type (quote ghci))
+ '(haskell-process-use-ghci t)
  '(haskell-process-use-presentation-mode t)
  '(haskell-stylish-on-save nil)
  '(haskell-tags-on-save nil)
@@ -58,6 +60,8 @@
  '(ibuffer-default-sorting-mode (quote filename/process))
  '(ido-default-buffer-method (quote selected-window))
  '(ido-enable-flex-matching t)
+ '(js2-strict-inconsistent-return-warning nil)
+ '(js2-strict-missing-semi-warning nil)
  '(linum-format "%4d")
  '(magit-log-arguments (quote ("--color" "--decorate")))
  '(safe-local-variable-values
