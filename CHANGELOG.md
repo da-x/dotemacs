@@ -1,4 +1,10 @@
-# v1.2 (unrelased)
+# v1.3 (unreleased)
+
+* `racer-rust-src-path` is now set automatically by default.
+* New simpler installation instructions based on `rustup`.
+* Fixed an issue with racer completion in indirect buffers.
+
+# v1.2
 
 * Added the command `racer-debug` to help users diagnose issues.
 * We now explicitly try `~/.cargo/bin/racer` if `racer` isn't on path.

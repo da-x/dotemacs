@@ -15,6 +15,7 @@ This is the official Emacs package for
     - [Find Definitions](#find-definitions)
     - [Describe Functions and Types](#describe-functions-and-types)
     - [Installation](#installation)
+        - [Testing your setup](#testing-your-setup)
     - [Tests](#tests)
 
 <!-- markdown-toc end -->
@@ -52,9 +53,11 @@ Use <kbd>M-x racer-describe</kbd> to open the help buffer.
 
 ## Installation
 
-1. Install [Racer](http://github.com/phildawes/racer):
+1. Install [Racer](http://github.com/phildawes/racer) and download the
+   source code of Rust:
 
    ```
+   $ rustup component add rust-src
    $ cargo install racer
    ```
 
@@ -65,14 +68,7 @@ Use <kbd>M-x racer-describe</kbd> to open the help buffer.
    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
    ```
 
-2. Install racer: `M-x package-install RET racer RET`
-
-3. Download the [rust sourcecode](https://www.rust-lang.org/en-US/downloads.html),
-   and configure emacs to find your rust source directory:
-   
-   ```el
-   (setq racer-rust-src-path "<path-to-rust-srcdir>/src/")
-   ```
+3. Install the Emacs package for Racer: `M-x package-install RET racer RET`
 
 4. Configure Emacs to activate racer when rust-mode starts:
    ```el
@@ -89,14 +85,21 @@ Use <kbd>M-x racer-describe</kbd> to open the help buffer.
    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
    (setq company-tooltip-align-annotations t)
    ```
-   For automatic completions, customize `company-idle-delay` and `company-minimum-prefix-length`.
+   For automatic completions, customize `company-idle-delay` and
+   `company-minimum-prefix-length`.
 
-5. Open a rust file and try typing ```use std::io::B``` and press <kbd>TAB</kbd>.
+### Testing your setup
 
-6. Place your cursor over a symbol and hit `M-.` to jump to the
-definition.
+To test **completion**: Open a rust file and try typing ```use
+std::io::B``` and press <kbd>TAB</kbd>.
 
-7. Hit `M-,` to jump back to the symbol usage location.
+To test **go to definition**: Place your cursor over a symbol and press
+`M-.` to jump to its definition.
+
+Press `M-,` to jump back to the previous cursor location.
+
+If **it doesn't work**, try `M-x racer-debug` to see what command was
+run and what output was returned.
 
 ## Tests
 

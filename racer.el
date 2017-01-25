@@ -1,11 +1,11 @@
-;;; racer.el --- The official Emacs package for Racer  -*- lexical-binding: t -*-
+;;; racer.el --- code completion, goto-definition and docs browsing for Rust via racer  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Phil Dawes
 
 ;; Author: Phil Dawes
 ;; URL: https://github.com/racer-rust/emacs-racer
-;; Version: 1.2
-;; Package-Requires: ((emacs "24.3") (rust-mode "0.2.0") (dash "2.11.0") (s "1.10.0") (f "0.18.2"))
+;; Version: 1.3
+;; Package-Requires: ((emacs "24.3") (rust-mode "0.2.0") (dash "2.13.0") (s "1.10.0") (f "0.18.2"))
 ;; Keywords: abbrev, convenience, matching, rust, tools
 
 ;; This file is not part of GNU Emacs.
@@ -68,11 +68,9 @@
 (require 'thingatpt)
 (require 'button)
 (require 'help-mode)
-;; `cl-case' is not autoloaded on Emacs 24.4.
-(eval-when-compile (require 'cl))
 
 (defgroup racer nil
-  "Support for Rust completion via racer."
+  "Code completion, goto-definition and docs browsing for Rust via racer."
   :link '(url-link "https://github.com/racer-rust/emacs-racer/")
   :group 'rust-mode)
 
@@ -87,9 +85,19 @@
 (defcustom racer-rust-src-path
   (or
    (getenv "RUST_SRC_PATH")
+   (when (executable-find "rustc")
+     (let* ((sysroot (s-trim-right
+                      (shell-command-to-string
+                       (format "%s --print sysroot" (executable-find "rustc")))))
+            (src-path (f-join sysroot "lib/rustlib/src/rust/src")))
+       (when (file-exists-p src-path)
+         src-path)
+       src-path))
    "/usr/local/src/rust/src")
+
   "Path to the rust source tree.
-If nil, we will query $RUST_SRC_PATH at runtime."
+If nil, we will query $RUST_SRC_PATH at runtime.
+If $RUST_SRC_PATH is not set, look for rust source in rustup's install directory."
   :type 'file
   :group 'racer)
 
@@ -104,7 +112,8 @@ If nil, we will query $CARGO_HOME at runtime."
 
 (defun racer--cargo-project-root ()
   "Find the root of the current Cargo project."
-  (let ((root (locate-dominating-file (or buffer-file-name default-directory) "Cargo.toml")))
+  (let ((root (locate-dominating-file (or (buffer-file-name (buffer-base-buffer)) default-directory)
+                                      "Cargo.toml")))
     (and root (file-truename root))))
 
 (defun racer--header (text)
@@ -118,6 +127,8 @@ If nil, we will query $CARGO_HOME at runtime."
 Helps users find configuration issues, or file bugs on
 racer or racer.el."
   (interactive)
+  (unless racer--prev-state
+    (user-error "Must run a racer command before debugging"))
   (let ((buf (get-buffer-create "*racer-debug*"))
         (inhibit-read-only t))
     (with-current-buffer buf
@@ -159,8 +170,8 @@ racer or racer.el."
 
          ;; Give copy-paste instructions for reproducing any errors
          ;; the user has seen.
-         (racer--header "The temporary file will have been deleted. You should be able to reproduce\n")
-         (racer--header "the same output from racer with the following command:\n\n")
+         (racer--header
+          (s-word-wrap 60 "The temporary file will have been deleted. You should be able to reproduce the same output from racer with the following command:\n\n"))
          (format "$ %s %s %s %s\n\n" cargo-home-used rust-src-path-used
                  (plist-get racer--prev-state :program)
                  (s-join " "
@@ -243,7 +254,7 @@ Return a list of all the lines returned by the command."
       (racer--call command
                    (number-to-string (line-number-at-pos))
                    (number-to-string (racer--current-column))
-                   (buffer-file-name)
+                   (buffer-file-name (buffer-base-buffer))
                    tmp-file)))))
 
 (defun racer--read-rust-string (string)
@@ -443,7 +454,7 @@ fenced code delimiters and code annotations."
                    ;; Remove trailing newlines, so we can ensure we
                    ;; have consistent blank lines between sections.
                    (racer--trim-newlines
-                    (cl-case section-type
+                    (pcase section-type
                       (:text
                        (racer--propertize-all-inline-code
                         (racer--propertize-links
