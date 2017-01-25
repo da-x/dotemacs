@@ -83,7 +83,7 @@ remove() {
 }
 
 ${cmd} modes/company-mode https://github.com/company-mode/company-mode master
-${cmd} modes/dash https://github.com/magnars/dash.el.git master
+${cmd} modes/dash https://github.com/magnars/dash.el.git 2.13.0
 ${cmd} modes/diff-hl https://github.com/dgutov/diff-hl.git master
 ${cmd} modes/dmode https://github.com/Emacs-D-Mode-Maintainers/Emacs-D-Mode.git master
 ${cmd} modes/intero https://github.com/commercialhaskell/intero master
