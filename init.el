@@ -46,7 +46,7 @@
 
 ;; Auto-revert
 (setq auto-revert-verbose nil)
-(global-auto-revert-mode)
+;; (global-auto-revert-mode)
 (setq global-auto-revert-non-file-buffers t)
 
 ;; Auto-save
@@ -310,7 +310,7 @@
 (defun my/rust-mode-hook ()
   (flycheck-select-checker 'rust-cargo)
   (company-mode)
-;;  (racer-mode)
+  (racer-mode)
   )
 
 (defun my/racer-mode-hook ()
@@ -320,7 +320,7 @@
 
 (add-hook 'rust-mode-hook 'my/rust-mode-hook)
 (add-hook 'racer-mode-hook 'my/racer-mode-hook)
-;; (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 
 ;; Go
 (require 'go-mode)
