@@ -45,9 +45,6 @@ than too little. Here’s a list of facts that are important:
 * What you did, and what you expected to happen instead
 * Whether and how you were able to `reproduce the issue in emacs -Q`_
 * Your Flycheck setup from ``M-x flycheck-verify-setup``
-* Your operating system
-* Your Emacs version from ``M-x emacs-version``
-* Your Flycheck version from ``M-x flycheck-version``
 
 .. _search existing issues: https://github.com/flycheck/flycheck/issues?q=is%3Aissue
 .. _issue form: https://github.com/flycheck/flycheck/issues/new
@@ -125,7 +122,7 @@ mandatory for pull requests, though, we will test your changes, too.
 
    To contribute to Flycheck you must sign our CLA_ (Contributor License
    Agreement).  The CLA Assistant bot will automatically ask you to do this when
-   you open a pull request, and let's you sign the CLA through your Github
+   you open a pull request, and will let you sign the CLA through your Github
    account.
 
    We require this process mostly to make you aware of the licensing
@@ -134,10 +131,16 @@ mandatory for pull requests, though, we will test your changes, too.
 
    .. _CLA: https://gist.github.com/lunaryorn/c9c0d656fe7e704da2f734779242ec99
 
-All pull requests are reviewed by a :ref:`maintainer <flycheck-maintainers>`.
-Feel free to mention individual developers (e.g. ``@lunaryorn``) to request a
-review from a specific person, or ``@flycheck/maintainers`` if you have general
-questions or if your pull request was waiting for review too long.
+All pull requests go through a two-stage review process:
+
+* :ref:`Maintainer <flycheck-maintainers>` review the general idea and direction
+  of the pull request and leave a ``LGTM`` comment if they believe that the
+  change is a good addition to Flycheck.  We currently require at least one
+  approval from a maintainer.
+* :ref:`All contributors <flycheck-language-teams>`—language teams in
+  particular—check the technical implementation of a pull request through `pull
+  request reviews`_, and either approve it or request changes.  We currently
+  require at least one approval and no requested changes.
 
 .. important::
 
@@ -148,12 +151,20 @@ questions or if your pull request was waiting for review too long.
    Take a look at it to see what we look for in a code review.
 
 Additionally all pull requests go through automated tests on `Travis CI`_ which
-check code style, run unit tests, etc.
+check code style, run unit tests, etc
 
-After the pull request was reviewed and if all tests passed maintainers will
-leave a ``LGTM`` comment at which point the pull request is ready for being
-merged.
+Feel free to mention individual contributors or entire teams
+(e.g. ``@flycheck/maintainers`` or ``@flycheck/javascript``) to ask for help or
+feedback or request a review.  Please mention the maintainers
+(``@flycheck/maintainers``) if you think that your pull request has been waiting
+for review too long.  You can expect a first response to any pull request in a
+couple of days.
 
+Once the pull request passed review and automated tests we will merge it.  We
+may also ask you whether you'd like to join Flycheck and help us, thus giving
+you commit access to our repository and let you merge your own pull request.
+
+.. _pull request reviews: https://help.github.com/articles/about-pull-request-reviews/
 .. _Travis CI: https://travis-ci.org/flycheck/flycheck/pull_requests
 
 Writing documentation
@@ -176,8 +187,8 @@ modules.  ``make init`` will warn you if you do not.
 When editing documentation run ``make html-auto`` to view the results of your
 edits.  This target runs a local webserver at http://localhost:8000 which serves
 the HTML documentation and watches the documentation sources for changes to
-rebuild automatically.  When you finished your edits it is a good idea to run
-``make linkcheck`` to verify all links in the documentation.  Note that this
+rebuild automatically.  When you have finished your edits it is a good idea to
+run ``make linkcheck`` to verify all links in the documentation.  Note that this
 target can take a while especially when run on a clean build.
 
 Run ``make help`` to see a list of all available Make targets for the
@@ -188,7 +199,7 @@ find documentation issues sort by the `documentation`_ label.
 
 .. _ReStructuredText: http://docutils.sourceforge.net/rst.html
 .. _Sphinx: http://www.sphinx-doc.org
-.. _Homebrew: http://brew.sh
+.. _Homebrew: https://brew.sh
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 .. _documentation: https://github.com/flycheck/flycheck/labels/documentation
 

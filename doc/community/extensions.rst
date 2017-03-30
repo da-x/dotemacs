@@ -35,6 +35,7 @@ These extensions change Flycheck’s user interface:
   graphical popup.
 * :gh:`liblit/flycheck-status-emoji` adds cute emoji (e.g. 😱 for errors) to
   Flycheck’s mode line status.
+* :gh:`Wilfred/flycheck-title` shows Flycheck error messages in the frame title.
 
 Language support
 ================
@@ -52,7 +53,7 @@ Cadence
 * :gh:`cmarqu/flycheck-hdl-irun` adds a syntax checker for hardware description
   languages supported by `Cadence IES/irun`_.
 
-.. _Cadence IES/irun: http://www.cadence.com/products/fv/enterprise_simulator/pages/default.aspx
+.. _Cadence IES/irun: https://www.cadence.com/content/cadence-www/global/en_US/home/tools/system-design-and-verification/simulation-and-testbench-verification/incisive-enterprise-simulator.html
 
 Clojure
 -------
@@ -64,8 +65,6 @@ C/C++/Objective C
 
 * :gh:`Wilfred/flycheck-pkg-config` configures Flycheck to use settings from
   `pkg-config`_ when checking C/C++.
-* :flyc:`flycheck-google-cpplint` (*official*) adds a syntax checker for
-  Google's C++ style checker.
 * :gh:`Sarcasm/flycheck-irony` adds a Flycheck syntax checker for C, C++ and
   Objective C using :gh:`Irony Mode <Sarcasm/irony-mode>`.
 
@@ -119,14 +118,14 @@ OCaml
 -----
 
 * :flyc:`flycheck-ocaml` (*official*) adds a syntax checker for OCaml using the
-  :gh:`Merlin <the-lambda-church/merlin>` backend.
+  :gh:`Merlin <ocaml/merlin>` backend.
 
 Python
 ------
 
 * :gh:`Wilfred/flycheck-pyflakes` adds a Python syntax checker using Pyflakes.
 
-.. _Pyflakes: https://github.com/pyflakes/pyflakes
+.. _Pyflakes: https://github.com/PyCQA/pyflakes
 
 Rust
 ----

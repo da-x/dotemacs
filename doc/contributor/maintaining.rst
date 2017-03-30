@@ -66,46 +66,91 @@ Our workflow implies a couple of rules about which branches to push code to:
 
 .. _pull request: https://help.github.com/articles/using-pull-requests/
 
-.. _flycheck-pull-requests:
+.. _flycheck-pull-requests-reviews:
 
-Pull requests
--------------
+Pull requests reviews
+---------------------
 
-Please review pull requests according to our :ref:`style guide
-<flycheck-style-guide>`, and consider whether you personally think that the
-change is a good addition to Flycheck.
+We review all pull requests, and require two different kinds of approval:
 
-**All pull requests require approval of a maintainer**.
+* At least one maintainer must approve the idea and direction with a ``LGTM``
+  comment.
+* At least one contributor (maintainer or otherwise) must approve the
+  implementation by leaving an approved `pull request review`_, and no
+  contributors must have requested changes.
 
-To state your approval as a maintainer add a comment that contains ``LGTM``.
-The LGTM.co will look for these comments and unlock the pull request once enough
-maintainers approved it.  We require approvals from multiple maintainers, see
-``.lgtm`` for the exact amount of approvals required to accept a pull request.
+.. _pull request review: https://help.github.com/articles/about-pull-request-reviews/
 
-.. important::
+As a maintainer
+~~~~~~~~~~~~~~~
 
-   LGTM.co does not require repeated approval after changes to the pull
-   request.  Hence you can “approve early”, i.e. approve before the pull request
-   is polished.
+* Consider whether you personally think that the change is a good addition to
+  Flycheck.
+* Weight the expected benefits and impact of the feature against the
+  expected complexity.
+* Check whether the pull request complies with our :ref:`style guide
+  <flycheck-style-guide>`, but don't go too much into technical details.
+* Don't review for technical details.  It's the idea and direction that counts.
 
-   And it’s absolutely fine to do so.  If there are only minor changes left, if
-   you trust the pull request author to address remaining issues, **feel free to
-   approve early**, all the more if the pull request author is already a
-   **contributor**.  In this case they’ll be able to directly merge their own
-   pull request after making changes to it which decreases the turn-around time
-   for pull requests.
+If you would like to see the pull request in Flycheck leave a ``LGTM`` comment.
+
+As a contributor
+~~~~~~~~~~~~~~~~
+
+* Check the technical implementation.
+* Consider the impact on syntax checking for a language.
+* Check whether the tests pass.
+* Check whether the PR complies with our :ref:`style guide
+  <flycheck-style-guide>`.
+* Challenge the technical implementation of a pull request, and ask questions
+  about dubious code.
+* Consider whether there might be a simpler approach or a better solution to the
+  problem that the PR solves.
+
+If you find any issues please leave a `pull request review`_ that requests
+for changes.  Please try to leave an inline comment wherever possible and try to
+suggest a better solution, to make it easy for the PR author to discover and fix
+the issues.
+
+If you didn't find any issues leave a `pull request review`_ that approves the
+changes.
+
+In doubt request changes first and let the PR author explain their intention and
+implementation.  You can still approve the review afterwards if you are
+satisfied.
 
 Merge guidelines
 ~~~~~~~~~~~~~~~~
 
-If a pull request was approved you may directly merge it.  For smaller pull
-requests please “Squash and Merge” to keep a linear history, otherwise merge
-normally.  What constitutes a "small" pull request is at your discretion.  Apply
-common sense :)
+Any contributor may merge approved pull requests.  Our protection rules for the
+``master`` branch ensure that only approved pull requests can be merged, but you
+still have to check a few things before merging:
 
-You may also add the author of the pull request to the "Core developers" team to
-give them commit access to the Flycheck repository and ask them merge the pull
-request themselves.  That's a good way to gain new contributors.
+* Are commits squashed?  Before merging please take an extra look at the commits
+  to make sure that the commits were properly squashed and have good commit
+  messages.  If needed, ask the contributor to improve the commit messages and
+  squash the commits first, by requesting changes with a pull request review.
+* Does the PR pass the integration tests?  We don't run integration tests
+  automatically, so contributors should make sure to run them on their side.
+* Should the PR warrant a line in the changelog?  User-facing changes should be
+  documented in ``CHANGES.rst``.
+
+For new features:
+
+* Does the PR include tests?  A new syntax checker should have at least one
+  accompanying integration test.
+* Does the PR include documentation?  New syntax checkers or options should be
+  documented in :ref:`flycheck-languages`.
+
+If all the points above have been addressed, then go ahead and click that green
+button :)
+
+.. note::
+
+   We require proper merges for pull requests, to preserve the fact that a
+   change came from a pull request in the git history and to retain any commit
+   signatures that may exist.  As such you can't squash-merge or rebase-merge
+   through GitHub's UI.
 
 .. _flycheck-git-signatures:
 
@@ -143,9 +188,6 @@ extra tooling and some 3rd party services for Flycheck:
   configuration.
 * `Travis CI`_ runs our tests after every push and for every pull request.
   It's configured through ``.travis.yml``.
-* LGTM_ handles the pull request approval process through ``LGTM`` comments.
-  It's configured through ``.lgtm``, the list of maintainers that may approve
-  pull requests is in the ``MAINTAINERS`` file.
 * `CLA assistant`_ checks signatures to our CLA_ and allows contributors to sign
   the CLA through their Github account.
 
@@ -155,7 +197,6 @@ these services so in case of an issue just contact them.
 .. _Github: https://github.com/flycheck
 .. _ReadTheDocs: https://readthedocs.org/projects/flycheck/
 .. _Travis CI: https://travis-ci.org/flycheck/flycheck
-.. _LGTM: https://lgtm.co/
 .. _CLA assistant: https://cla-assistant.io
 .. _CLA: https://gist.github.com/lunaryorn/c9c0d656fe7e704da2f734779242ec99
 
@@ -178,7 +219,7 @@ To install all required libraries run ``make -C maint init``.  We recommend that
 you use virtualenv_ to avoid a global installation of Python modules.  ``make
 init`` will warn you if you do not.
 
-.. _Homebrew: http://brew.sh
+.. _Homebrew: https://brew.sh
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 
 Versioning and releases
@@ -252,8 +293,8 @@ New maintainers
 
 To propose a new maintainer open a pull request that adds the user to
 ``MAINTAINERS`` and ``doc/community/people.rst``.  The pull request is subject
-to the :ref:`same rules <flycheck-pull-requests>` as all other pull requests.
-Notably it goes through the same approval process.
+to the :ref:`same rules <flycheck-pull-requests-reviews>` as all other pull
+requests.  Notably it goes through the same approval process.
 
 Once merged please also
 

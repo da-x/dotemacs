@@ -50,6 +50,12 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
 .. supported-language:: AsciiDoc
 
+   .. syntax-checker:: asciidoctor
+
+      Check AsciiDoc with the default Asciidoctor_ backend.
+
+      .. _Asciidoctor: http://asciidoctor.org
+
    .. syntax-checker:: asciidoc
 
       Check AsciiDoc_ with the standard AsciiDoc processor.
@@ -191,7 +197,7 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
    .. syntax-checker:: cfengine
 
-      Check syntax with `CFEngine <http://cfengine.com/>`_.
+      Check syntax with `CFEngine <https://cfengine.com/>`_.
 
 .. supported-language:: Chef
 
@@ -232,6 +238,18 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       .. _CSSLint: https://github.com/CSSLint/csslint
 
+   .. syntax-checker:: css-stylelint
+
+      Syntax-check and lint CSS with stylelint_.
+
+      .. _stylelint: https://stylelint.io
+
+      .. syntax-checker-config-file:: flycheck-stylelintrc
+
+      .. defcustom:: flycheck-stylelint-quiet
+
+         Whether to run stylelint in quiet mode via ``--quiet``.
+
 .. supported-language:: D
 
    .. syntax-checker:: d-dmd
@@ -255,6 +273,14 @@ to view the docstring of the syntax checker.  Likewise, you may use
       :flyc:`flycheck-d-unittest`
          Flycheck extension which provides a syntax checker to run D unittests
          on the fly and report the results with Flycheck.
+
+.. supported-language:: Dockerfile
+
+   .. syntax-checker:: dockerfile-hadolint
+
+      Check syntax and code style with hadolint_
+
+      .. _hadolint: http://hadolint.lukasmartinelli.ch/
 
 .. supported-language:: Elixir
 
@@ -387,6 +413,10 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
          Whether to check for shadowed variables, in Go 1.6 or newer.
 
+      .. defcustom:: flycheck-go-build-tags
+
+         A list of build tags.
+
       .. _vet: https://golang.org/cmd/vet/
 
    .. syntax-checker:: go-build
@@ -405,8 +435,9 @@ to view the docstring of the syntax checker.  Likewise, you may use
          `go-test`
 
       .. defcustom:: flycheck-go-build-tags
+         :noindex:
 
-         A list of build tags.
+         See `flycheck-go-build-tags`
 
    .. syntax-checker:: go-test
 
@@ -421,6 +452,11 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
          See `flycheck-go-build-install-deps`.
 
+      .. defcustom:: flycheck-go-build-tags
+         :noindex:
+
+         See `flycheck-go-build-tags`
+
    .. syntax-checker:: go-errcheck
 
       Check for unhandled error returns in Go with errcheck_.
@@ -431,6 +467,11 @@ to view the docstring of the syntax checker.  Likewise, you may use
          28th, 2015) or newer.
 
       .. _errcheck: https://github.com/kisielk/errcheck
+
+      .. defcustom:: flycheck-go-build-tags
+         :noindex:
+
+         See `flycheck-go-build-tags`
 
    .. syntax-checker:: go-unconvert
 
@@ -540,8 +581,8 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
 .. supported-language:: Javascript
 
-   Flycheck checks Javascript with one of `javascript-eslint`,
-   `javascript-jshint` or `javascript-gjslint`, and then with `javascript-jscs`.
+   Flycheck checks Javascript with one of `javascript-eslint` or
+   `javascript-jshint`, and then with `javascript-jscs`.
 
    Alternatively `javascript-standard` is used instead all of the former ones.
 
@@ -568,14 +609,6 @@ to view the docstring of the syntax checker.  Likewise, you may use
          Whether to extract Javascript from HTML before linting.
 
       .. syntax-checker-config-file:: flycheck-jshintrc
-
-   .. syntax-checker:: javascript-gjslint
-
-      Lint with `Closure Linter`_.
-
-      .. _Closure Linter: https://developers.google.com/closure/utilities
-
-      .. syntax-checker-config-file:: flycheck-gjslintrc
 
    .. syntax-checker:: javascript-jscs
 
@@ -612,6 +645,18 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
          This syntax checker requires lessc 1.4 or newer.
 
+   .. syntax-checker:: less-stylelint
+
+      Syntax-check and lint Less with stylelint_.
+
+      .. _stylelint: https://stylelint.io
+
+      .. syntax-checker-config-file:: flycheck-stylelintrc
+
+      .. defcustom:: flycheck-stylelint-quiet
+
+         Whether to run stylelint in quiet mode via ``--quiet``.
+
 .. supported-language:: Lua
 
    Flycheck checks Lua with `lua-luacheck`, falling back to `lua`.
@@ -619,6 +664,12 @@ to view the docstring of the syntax checker.  Likewise, you may use
    .. syntax-checker:: lua-luacheck
 
       Check syntax and lint with Luacheck_.
+
+      .. syntax-checker-config-file:: flycheck-luacheckrc
+
+      .. defcustom:: flycheck-luacheck-standards
+
+         The luacheck standards to use via one or more ``--std`` arguments.
 
       .. _Luacheck: https://github.com/mpeterv/luacheck
 
@@ -706,11 +757,19 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       Check syntax using the `Processing <https://processing.org/>`_ compiler.
 
+.. supported-language:: Protobuf
+
+   .. syntax-checker:: protobuf-protoc
+
+      Check syntax using the protoc_ compiler.
+
+      .. _protoc: https://developers.google.com/protocol-buffers/
+
 .. supported-language:: Pug
 
    .. syntax-checker:: pug
 
-      Check syntax using the `Pug <http://www.pugjs.org>`_ compiler.
+      Check syntax using the `Pug <https://www.pugjs.org>`_ compiler.
 
 .. supported-language:: Puppet
 
@@ -739,7 +798,7 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       :gh:`flycheck-pyflakes <Wilfred/flycheck-pyflakes>`
          Flycheck extension which adds a syntax checker using `Pyflakes
-         <https://github.com/pyflakes/pyflakes>`_.
+         <https://github.com/PyCQA/pyflakes>`_.
 
    .. syntax-checker:: python-flake8
 
@@ -895,7 +954,8 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       .. note::
 
-         These syntax checkers require Rust 1.7 or newer.
+         `rust-cargo` requires Rust 1.15 or newer.
+         `rust` requires Rust 1.7 or newer.
 
       .. _Cargo: http://doc.crates.io/index.html
 
@@ -926,15 +986,22 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       .. defcustom:: flycheck-rust-crate-type
 
-         The type of the crate to check, as string for the ``--crate-type``
-         option.
+         For `rust-cargo`, the target type as a string, one of ``lib``, ``bin``,
+         ``example``, ``test`` or ``bench``.  Can also be nil for projects with
+         a single target.
+
+         For `rust`, the type of the crate to check, as a string for the
+         ``--crate-type`` option.
 
       .. defcustom:: flycheck-rust-binary-name
 
-         The name of the binary to pass to ``cargo rustc --bin``, as a string.
+         The name of the binary to pass to ``cargo rustc --TARGET-TYPE``, as a
+         string.
 
-         Only required when `flycheck-rust-crate-type` is ``bin`` and the crate
-         has multiple targets.
+         For `rust-cargo`, always required unless `flycheck-rust-crate-type` is
+         ``lib`` or nil, in which case it is ignored.
+
+         Ignored by `rust`.
 
       .. defcustom:: flycheck-rust-library-path
 
@@ -944,8 +1011,8 @@ to view the docstring of the syntax checker.  Likewise, you may use
 .. supported-language:: Sass/SCSS
 
    Flycheck checks SASS with `sass/scss-sass-lint`, falling back to `sass`, and
-   SCSS with  `scss-lint`, falling back to `sass/scss-sass-lint` first and then
-   `scss` if neither is available.
+   SCSS with  `scss-lint` or `scss-stylelint` falling back to
+   `sass/scss-sass-lint` first and then `scss` if neither is available.
 
    .. syntax-checker:: scss-lint
 
@@ -966,6 +1033,18 @@ to view the docstring of the syntax checker.  Likewise, you may use
       .. _SASS-Lint: https://github.com/sasstools/sass-lint
 
       .. syntax-checker-config-file:: flycheck-sass-lintrc
+
+   .. syntax-checker:: scss-stylelint
+
+      Syntax-check and lint SCSS with stylelint_.
+
+      .. _stylelint: https://stylelint.io
+
+      .. syntax-checker-config-file:: flycheck-stylelintrc
+
+      .. defcustom:: flycheck-stylelint-quiet
+
+         Whether to run stylelint in quiet mode via ``--quiet``.
 
    .. syntax-checker:: sass
                        scss
@@ -992,7 +1071,7 @@ to view the docstring of the syntax checker.  Likewise, you may use
          This syntax checker is fairly primitive.  For a better Scala experience
          we recommend Ensime_.
 
-         .. _Ensime: http://ensime.github.io
+         .. _Ensime: http://ensime.org/
 
    .. syntax-checker:: scala-scalastyle
 
@@ -1075,6 +1154,14 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
       Check SQL syntax with `Sqlint <https://github.com/purcell/sqlint>`_.
 
+.. supported-language:: systemd Unit Configuration
+
+   .. syntax-checker:: systemd-analyze
+
+      Check systemd unit configuration file syntax with `systemd-analyze`_.
+
+      .. _systemd-analyze: https://www.freedesktop.org/software/systemd/man/systemd-analyze.html
+
 .. supported-language:: TeX/LaTeX
 
    Flycheck checks TeX and LaTeX with either `tex-chktex` or `tex-lacheck`.
@@ -1109,11 +1196,15 @@ to view the docstring of the syntax checker.  Likewise, you may use
 
          Additional rules directory, for user created rules.
 
+      .. defcustom:: flycheck-tslint-args
+
+         A list of additional arguments that are passed to tslint.
+
 .. supported-language:: Verilog
 
    .. syntax-checker:: verilog-verilator
 
-      Check syntax with `Verilator <http://www.veripool.org/wiki/verilator>`_.
+      Check syntax with `Verilator <https://www.veripool.org/wiki/verilator>`_.
 
       .. defcustom:: flycheck-verilator-include-path
 
