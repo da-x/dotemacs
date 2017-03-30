@@ -1,3 +1,36 @@
+31-cvs (in development)
+=======================
+
+- **Breaking changes**
+
+  - ``rust-cargo`` now requires Rust 1.15 or newer [GH-1201]
+  - Remove javascript-gjslint checker
+
+- New syntax checkers:
+
+  - Protobuf with ``protoc`` [GH-1125]
+  - systemd-analyze with ``systemd-analyze`` [GH-1135]
+  - Dockerfile with ``hadolint`` [GH-1194]
+  - AsciiDoc with ``asciidoctor`` [GH-1167]
+  - CSS/SCSS/LESS with ``stylelint`` [GH-903]
+
+- New features:
+
+  - Add ``flycheck-tslint-args`` to pass additional arguments to tslint [GH-1186]
+
+- Improvements:
+
+  - Use option ``flycheck-go-build-tags`` to for ``go-test``,
+    ``go-vet`` and ``go-errcheck`` as well.
+  - Add a revert function to ``flycheck-verify-setup``, so hitting
+    ``g`` reloads the buffer.
+  - Make sure the erlang compiler is only run on compilable files.
+  - ``flycheck-tslint`` does not crash any more on deprecation notices [GH-1174]
+  - ``rust-cargo`` now checks integration tests, examples and benchmarks
+    [GH-1206]
+  - ``rust-cargo`` does not use ``flycheck-rust-library-path`` anymore, as
+    dependencies are taken care of by Cargo [GH-1206]
+
 30 (Oct 12, 2016)
 =================
 
