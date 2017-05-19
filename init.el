@@ -305,9 +305,11 @@
 ;; Rust
 (require 'company)
 (require 'rust-mode)
+(require 'flycheck-rust)
 (require 'racer)
 
 (defun my/rust-mode-hook ()
+  (flycheck-rust-setup)
   (flycheck-select-checker 'rust-cargo)
   (company-mode)
   (racer-mode)
