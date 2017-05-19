@@ -102,6 +102,7 @@ ${cmd} modes/magit https://github.com/magit/magit.git 2.2.2
 ${cmd} modes/perspective https://github.com/nex3/perspective-el.git 1.12
 ${cmd} modes/projectile https://github.com/bbatsov/projectile.git v0.14.0
 ${cmd} modes/rust https://github.com/rust-lang/rust-mode master
+${cmd} modes/flycheck-rust https://github.com/flycheck/flycheck-rust master
 ${cmd} modes/racer https://github.com/racer-rust/emacs-racer master
 ${cmd} modes/smartparens https://github.com/Fuco1/smartparens.git master
 ${cmd} modes/smooth-scrolling https://github.com/aspiers/smooth-scrolling.git master
