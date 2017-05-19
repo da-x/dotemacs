@@ -221,9 +221,11 @@ attention to case differences."
     racket
     rpm-rpmlint
     markdown-mdl
+    nix
     rst-sphinx
     rst
     ruby-rubocop
+    ruby-reek
     ruby-rubylint
     ruby
     ruby-jruby
@@ -3003,15 +3005,18 @@ ERR is a Flycheck error.  MODE may be one of the following symbols:
      Return the line region.
 
 Otherwise signal an error."
-  (pcase mode
-    (`columns (or (flycheck-error-column-region err)
-                  (flycheck-error-line-region err)))
-    (`symbols (or (flycheck-error-thing-region 'symbol err)
+  ;; Ignoring fields speeds up calls to `line-end-position' in
+  ;; `flycheck-error-column-region' and `flycheck-error-line-region'.
+  (let ((inhibit-field-text-motion t))
+    (pcase mode
+      (`columns (or (flycheck-error-column-region err)
+                    (flycheck-error-line-region err)))
+      (`symbols (or (flycheck-error-thing-region 'symbol err)
+                    (flycheck-error-region-for-mode err 'columns)))
+      (`sexps (or (flycheck-error-thing-region 'sexp err)
                   (flycheck-error-region-for-mode err 'columns)))
-    (`sexps (or (flycheck-error-thing-region 'sexp err)
-                (flycheck-error-region-for-mode err 'columns)))
-    (`lines (flycheck-error-line-region err))
-    (_ (error "Invalid mode %S" mode))))
+      (`lines (flycheck-error-line-region err))
+      (_ (error "Invalid mode %S" mode)))))
 
 (defun flycheck-error-pos (err)
   "Get the buffer position of ERR.
@@ -3103,6 +3108,7 @@ Add ERRORS to `flycheck-current-errors' and process each error
 with `flycheck-process-error-functions'."
   (setq flycheck-current-errors (sort (append errors flycheck-current-errors)
                                       #'flycheck-error-<))
+  (overlay-recenter (point-max))
   (seq-do (lambda (err)
             (run-hook-with-args-until-success 'flycheck-process-error-functions
                                               err))
@@ -3707,6 +3713,7 @@ overlays."
 
 (defun flycheck-delete-all-overlays ()
   "Remove all flycheck overlays in the current buffer."
+  (overlay-recenter (point-max))
   (flycheck-delete-marked-overlays)
   (save-restriction
     (widen)
@@ -3720,6 +3727,7 @@ overlays."
 
 (defun flycheck-delete-marked-overlays ()
   "Delete all overlays marked for deletion."
+  (overlay-recenter (point-max))
   (seq-do #'delete-overlay flycheck-overlays-to-delete)
   (setq flycheck-overlays-to-delete nil))
 
@@ -5595,6 +5603,30 @@ See URL `http://phpmd.org/' for more information about phpmd."
                       errors)))))))))
        (nreverse errors)))))
 
+(defun flycheck-parse-reek (output checker buffer)
+  "Parse Reek warnings from JSON OUTPUT.
+
+CHECKER and BUFFER denote the CHECKER that returned OUTPUT and
+the BUFFER that was checked respectively.
+
+See URL `https://github.com/troessner/reek' for more information
+about Reek."
+  (let ((errors nil))
+    (dolist (message (car (flycheck-parse-json output)))
+      (let-alist message
+        (dolist (line (delete-dups .lines))
+          (push
+           (flycheck-error-new-at
+            line
+            nil
+            'warning (concat .context " " .message)
+            :id .smell_type
+            :checker checker
+            :buffer buffer
+            :filename .source)
+           errors))))
+    (nreverse errors)))
+
 (defun flycheck-parse-tslint (output checker buffer)
   "Parse TSLint errors from JSON OUTPUT.
 
@@ -6349,12 +6381,9 @@ warnings."
 (flycheck-define-checker c/c++-gcc
   "A C/C++ syntax checker using GCC.
 
-Requires GCC 4.8 or newer.  See URL `https://gcc.gnu.org/'."
+Requires GCC 4.4 or newer.  See URL `https://gcc.gnu.org/'."
   :command ("gcc"
             "-fshow-column"
-            "-fno-diagnostics-show-caret" ; Do not visually indicate the source location
-            "-fno-diagnostics-show-option" ; Do not show the corresponding
-                                        ; warning group
             "-iquote" (eval (flycheck-c/c++-quoted-include-directory))
             (option "-std=" flycheck-gcc-language-standard concat)
             (option-flag "-pedantic" flycheck-gcc-pedantic)
@@ -6385,7 +6414,8 @@ Requires GCC 4.8 or newer.  See URL `https://gcc.gnu.org/'."
    (info line-start (or "<stdin>" (file-name)) ":" line ":" column
          ": note: " (message) line-end)
    (warning line-start (or "<stdin>" (file-name)) ":" line ":" column
-            ": warning: " (message) line-end)
+            ": warning: " (message (one-or-more (not (any "\n["))))
+            (optional "[" (id (one-or-more not-newline)) "]") line-end)
    (error line-start (or "<stdin>" (file-name)) ":" line ":" column
           ": " (or "fatal error" "error") ": " (message) line-end))
   :error-filter
@@ -8418,7 +8448,6 @@ Requires Flake8 3.0 or newer. See URL
 `https://flake8.readthedocs.io/'."
   :command ("flake8"
             "--format=default"
-            "--stdin-display-name" source-original
             (config-file "--config" flycheck-flake8rc)
             (option "--max-complexity" flycheck-flake8-maximum-complexity nil
                     flycheck-option-int)
@@ -8428,11 +8457,10 @@ Requires Flake8 3.0 or newer. See URL
   :standard-input t
   :error-filter (lambda (errors)
                   (let ((errors (flycheck-sanitize-errors errors)))
-                    (seq-do #'flycheck-flake8-fix-error-level errors)
-                    errors))
+                    (seq-map #'flycheck-flake8-fix-error-level errors)))
   :error-patterns
   ((warning line-start
-            (file-name) ":" line ":" (optional column ":") " "
+            "stdin:" line ":" (optional column ":") " "
             (id (one-or-more (any alpha)) (one-or-more digit)) " "
             (message (one-or-more not-newline))
             line-end))
@@ -8642,6 +8670,13 @@ See URL `https://sourceforge.net/projects/rpmlint/'."
       (unless (flycheck-error-line err)
         (setf (flycheck-error-line err) 1)))
     errors)
+  :error-explainer
+  (lambda (error)
+    (-when-let* ((error-message (flycheck-error-message error))
+                 (message-id (save-match-data (string-match "\\([^ ]+\\)" error-message)
+                                              (match-string 1 error-message))))
+      (with-output-to-string
+        (call-process "rpmlint" nil standard-output nil "-I" message-id))))
   :modes (sh-mode rpm-spec-mode)
   :predicate (lambda () (or (not (eq major-mode 'sh-mode))
                             ;; In `sh-mode', we need the proper shell
@@ -8701,6 +8736,22 @@ See URL `https://github.com/mivok/markdownlint'."
     (flycheck-sanitize-errors
      (flycheck-remove-error-file-names "(stdin)" errors)))
   :modes (markdown-mode gfm-mode))
+
+(flycheck-define-checker nix
+  "Nix checker using nix-instantiate.
+
+See URL `https://nixos.org/nix/manual/#sec-nix-instantiate'."
+  :command ("nix-instantiate" "--parse" "-")
+  :standard-input t
+  :error-patterns
+  ((error line-start
+          "error: " (message) " at " (file-name) ":" line ":" column
+          line-end))
+  :error-filter
+  (lambda (errors)
+    (flycheck-sanitize-errors
+     (flycheck-remove-error-file-names "(string)" errors)))
+  :modes nix-mode)
 
 (defun flycheck-locate-sphinx-source-directory ()
   "Locate the Sphinx source directory for the current buffer.
@@ -8799,6 +8850,23 @@ See URL `http://batsov.com/rubocop/'."
           (optional (id (one-or-more (not (any ":")))) ": ") (message)
           line-end))
   :modes (enh-ruby-mode ruby-mode)
+  :next-checkers ((warning . ruby-reek)
+                  (warning . ruby-rubylint)))
+
+;; Default to `nil' to let Reek find its configuration file by itself
+(flycheck-def-config-file-var flycheck-reekrc ruby-reek nil
+  :safe #'string-or-null-p
+  :package-version '(flycheck . "30"))
+
+(flycheck-define-checker ruby-reek
+  "A Ruby smell checker using reek.
+
+See URL `https://github.com/troessner/reek'."
+  :command ("reek" "--format" "json"
+            (config-file "--config" flycheck-reekrc)
+            source)
+  :error-parser flycheck-parse-reek
+  :modes (enh-ruby-mode ruby-mode)
   :next-checkers ((warning . ruby-rubylint)))
 
 ;; Default to `nil' to let Rubylint find its configuration file by itself, and
@@ -8833,7 +8901,7 @@ current versions of MRI and JRuby, but may break when used with
 other implementations or future versions of these
 implementations.
 
-Please consider using `ruby-rubocop' or `ruby-rubylint' instead.
+Please consider using `ruby-rubocop' or `ruby-reek' instead.
 
 See URL `https://www.ruby-lang.org/'."
   :command ("ruby" "-w" "-c")
@@ -8860,7 +8928,7 @@ See URL `http://jruby.org/'."
   :standard-input t
   :error-patterns
   ((error line-start "SyntaxError in -:" line ": " (message) line-end)
-   (warning line-start "-:" line " warning: " (message) line-end)
+   (warning line-start "-:" line ":" " warning: " (message) line-end)
    (error line-start  "-:" line ": " (message) line-end))
   :modes (enh-ruby-mode ruby-mode)
   :next-checkers ((warning . ruby-rubylint)))

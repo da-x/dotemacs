@@ -10,17 +10,21 @@
 
   - Protobuf with ``protoc`` [GH-1125]
   - systemd-analyze with ``systemd-analyze`` [GH-1135]
+  - Nix with ``nix-instantiate`` [GH-1164]
   - Dockerfile with ``hadolint`` [GH-1194]
   - AsciiDoc with ``asciidoctor`` [GH-1167]
   - CSS/SCSS/LESS with ``stylelint`` [GH-903]
+  - Ruby with ``reek`` [PR-1244]
 
 - New features:
 
   - Add ``flycheck-tslint-args`` to pass additional arguments to tslint [GH-1186]
+  - Add an error explainer to the ``rpm-rpmlint`` checker using
+    ``rpmlint -I`` [GH-1235]
 
 - Improvements:
 
-  - Use option ``flycheck-go-build-tags`` to for ``go-test``,
+  - Use option ``flycheck-go-build-tags`` for ``go-test``,
     ``go-vet`` and ``go-errcheck`` as well.
   - Add a revert function to ``flycheck-verify-setup``, so hitting
     ``g`` reloads the buffer.
@@ -30,6 +34,7 @@
     [GH-1206]
   - ``rust-cargo`` does not use ``flycheck-rust-library-path`` anymore, as
     dependencies are taken care of by Cargo [GH-1206]
+  - ``c/c++-gcc`` checker now works from GCC 4.4 and up [GH-1226]
 
 30 (Oct 12, 2016)
 =================
