@@ -309,9 +309,6 @@ very very very long string
      deindented
      1
      (lambda ()
-       ;; The indentation will fail in some cases if the syntax properties are
-       ;; not set.  This only happens when font-lock fontifies the buffer.
-       (font-lock-fontify-buffer)
        (indent-region 1 (+ 1 (buffer-size))))
      indented)))
 
@@ -951,7 +948,7 @@ Convert the line-column information from that list into a buffer position value.
 
 ;;; FIXME: Maybe add an ERT explainer function (something that shows the
 ;;; surrounding code of the final point, not just the position).
-(defun rust-test-motion (source-code init-pos final-pos manip-func &optional &rest args)
+(defun rust-test-motion (source-code init-pos final-pos manip-func &rest args)
   "Test that MANIP-FUNC moves point from INIT-POS to FINAL-POS.
 
 If ARGS are provided, send them to MANIP-FUNC.
@@ -960,12 +957,11 @@ INIT-POS, FINAL-POS are position symbols found in `rust-test-positions-alist'."
   (with-temp-buffer
     (rust-mode)
     (insert source-code)
-    (font-lock-fontify-buffer)
     (goto-char (rust-get-buffer-pos init-pos))
     (apply manip-func args)
     (should (equal (point) (rust-get-buffer-pos final-pos)))))
 
-(defun rust-test-region (source-code init-pos reg-beg reg-end manip-func &optional &rest args)
+(defun rust-test-region (source-code init-pos reg-beg reg-end manip-func &rest args)
   "Test that MANIP-FUNC marks region from REG-BEG to REG-END.
 
 INIT-POS is the initial position of point.
@@ -974,7 +970,6 @@ All positions are position symbols found in `rust-test-positions-alist'."
   (with-temp-buffer
     (rust-mode)
     (insert source-code)
-    (font-lock-fontify-buffer)
     (goto-char (rust-get-buffer-pos init-pos))
     (apply manip-func args)
     (should (equal (list (region-beginning) (region-end))
@@ -1377,24 +1372,6 @@ this_is_not_a_string();)"
      "r\" this is a comment\n" font-lock-comment-face
      "\"this is a string\"" font-lock-string-face)))
 
-(ert-deftest font-lock-raw-string-constant ()
-  ;; There was an issue in which a multi-line raw string would be fontified
-  ;; correctly if inserted, but then incorrectly if one of the lines was then
-  ;; edited.  This test replicates how font-lock responds when text in the
-  ;; buffer is modified in order to reproduce it.
-  (with-temp-buffer
-    (rust-mode)
-    (font-lock-fontify-buffer)
-    (insert "const BOO:&str = r#\"\nBOO\"#;")
-    (beginning-of-buffer)
-    (insert " ")
-    (font-lock-after-change-function 1 2 0)
-
-    (should (equal 'font-lock-string-face (get-text-property 19 'face))) ;; Opening "r" of raw string
-    (should (equal 'font-lock-string-face (get-text-property 27 'face))) ;; Closing "#" of raw string
-    (should (equal nil (get-text-property 28 'face))) ;; Semicolon--should not be part of the string
-    ))
-
 (ert-deftest font-lock-runaway-raw-string ()
   (rust-test-font-lock
    "const Z = r#\"my raw string\";\n// oops this is still in the string"
@@ -1533,6 +1510,15 @@ this_is_not_a_string();)"
    ;; Only the i32 should have been highlighted.
    '("i32" font-lock-type-face)))
 
+(ert-deftest rust-test-default-context-sensitive ()
+  (rust-test-font-lock
+   "let default = 7; impl foo { default fn f() { } }"
+   '("let" font-lock-keyword-face
+     "impl" font-lock-keyword-face
+     "default" font-lock-keyword-face
+     "fn" font-lock-keyword-face
+     "f" font-lock-function-name-face)))
+
 (ert-deftest indent-method-chains-no-align ()
   (let ((rust-indent-method-chain nil)) (test-indent
    "
@@ -1651,6 +1637,34 @@ fn main() {
 "
    )))
 
+(ert-deftest indent-function-after-where ()
+  (let ((rust-indent-method-chain t)) (test-indent
+   "
+fn each_split_within<'a, F>(ss: &'a str, lim: usize, mut it: F)
+                            -> bool where F: FnMut(&'a str) -> bool {
+}
+
+#[test]
+fn test_split_within() {
+}
+"
+   )))
+
+(ert-deftest indent-function-after-where-nested ()
+  (let ((rust-indent-method-chain t)) (test-indent
+   "
+fn outer() {
+    fn each_split_within<'a, F>(ss: &'a str, lim: usize, mut it: F)
+                                -> bool where F: FnMut(&'a str) -> bool {
+    }
+    #[test]
+    fn test_split_within() {
+    }
+    fn bar() {
+    }
+}
+"
+   )))
 
 (ert-deftest test-for-issue-36-syntax-corrupted-state ()
   "This is a test for a issue #36, which involved emacs's
@@ -1874,6 +1888,28 @@ la la\");
 pub fn foo<T,
            V>() {
     hello();
+}"))
+
+(ert-deftest indent-open-paren-in-column0 ()
+  ;; Just pass the same text for the "deindented" argument.  This
+  ;; avoids the extra spaces normally inserted, which would mess up
+  ;; the test because string contents aren't touched by reindentation.
+  (let ((text "
+const a: &'static str = r#\"
+{}\"#;
+fn main() {
+    let b = \"//\";
+    let c = \"\";
+
+}
+"))
+    (test-indent text text)))
+
+(ert-deftest indent-question-mark-operator ()
+  (test-indent "fn foo() {
+    if bar()? < 1 {
+    }
+    baz();
 }"))
 
 (defun rust-test-matching-parens (content pairs &optional nonparen-positions)
@@ -2552,34 +2588,6 @@ type Foo<T> where T: Copy = Box<T>;
      '(7 9))))
 
 
-(ert-deftest font-lock-extend-region-in-string ()
-  
-  (with-temp-buffer
-    (rust-mode)
-    (insert "
-fn foo() {
-    let x = r\"
-Fontification needs to include this whole string or none of it.
-             \"
-}")
-    (font-lock-fontify-buffer)
-    (let ((font-lock-beg 13)
-          (font-lock-end 42))
-      (rust-font-lock-extend-region)
-      (should (<= font-lock-beg 13))
-      (should (>= font-lock-end 106))
-      )
-    (let ((font-lock-beg 42)
-          (font-lock-end 108))
-      (rust-font-lock-extend-region)
-      (should (<= font-lock-beg 25))
-      (should (>= font-lock-end 108)))
-    (let ((font-lock-beg 1)
-          (font-lock-end 12))
-      (rust-font-lock-extend-region)
-      (should (<= font-lock-beg 1))
-      (should (>= font-lock-end 12)))))
-
 (ert-deftest redo-syntax-after-change-far-from-point ()  
   (let*
       ((tmp-file-name (make-temp-file "rust-mdoe-test-issue104"))
@@ -2602,18 +2610,6 @@ Fontification needs to include this whole string or none of it.
       )
     )
   )
-
-(ert-deftest rust-test-revert-hook-preserves-point ()
-  (with-temp-buffer
-    ;; Insert some code, and put point in the middle.
-    (insert "fn foo() {}\n")
-    (insert "fn bar() {}\n")
-    (insert "fn baz() {}\n")
-    (goto-char (point-min))
-    (forward-line 1)
-    (let ((initial-point (point)))
-      (rust--after-revert-hook)
-      (should (equal initial-point (point))))))
 
 (defun test-imenu (code expected-items)
   (with-temp-buffer
